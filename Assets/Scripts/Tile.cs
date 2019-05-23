@@ -5,6 +5,7 @@ using UnityEngine;
 public class Tile : MonoBehaviour
 {
     public Material HighlightMaterial;
+    public Chessman chessman;
 
     private Renderer renderer;
     private Material defaultMaterial;
