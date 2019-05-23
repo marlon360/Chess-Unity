@@ -93,10 +93,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveDirections:
-  - {x: 0, y: 1}
-  continuous: 0
-  allDirections: 0
-  jumping: 0
+  - {x: 1, y: 1}
+  continuous: 1
+  allDirections: 1
+  jumping: 1
+  team: 0
 --- !u!65 &9487024769602217
 BoxCollider:
   m_ObjectHideFlags: 0

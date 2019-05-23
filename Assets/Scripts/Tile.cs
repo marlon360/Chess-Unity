@@ -6,21 +6,22 @@ public class Tile : MonoBehaviour
 {
     public Material HighlightMaterial;
     public Chessman chessman;
+    public Vector2 position;
 
-    private Renderer renderer;
+    private Renderer rend;
     private Material defaultMaterial;
 
-    void Stat() {
-        renderer = GetComponent<Renderer>();
-        defaultMaterial = renderer.material;
+    void Start() {
+        rend = GetComponent<Renderer>();
+        defaultMaterial = rend.material;
     }
 
     public void SelectTile() {
-        renderer.material = HighlightMaterial;
+        rend.material = HighlightMaterial;
     }
 
     public void DeselectTile() {
-        renderer.material = defaultMaterial;
+        rend.material = defaultMaterial;
     }
 
 }
