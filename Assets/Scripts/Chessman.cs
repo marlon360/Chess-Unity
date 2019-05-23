@@ -9,6 +9,7 @@ public class Chessman : MonoBehaviour {
     public bool jumping;
 
     private Rigidbody rigid;
+    private bool selected = false;
 
     void Start () {
         rigid = GetComponent<Rigidbody> ();
@@ -20,11 +21,26 @@ public class Chessman : MonoBehaviour {
     }
 
     public void Select () {
+        selected = true;
         rigid.useGravity = false;
-        transform.position = transform.position + new Vector3 (0, 2, 0);
+        transform.position = transform.position + new Vector3 (0, 1, 0);
     }
 
     public void Deselect () {
+        selected = false;
         rigid.useGravity = true;
     }
+
+    // public Tile[] GetMovableTiles() {
+    //
+    // }
+
+    void OnMouseUp() {
+        if (selected) {
+            Deselect();
+        } else {
+            Select();
+        }
+    }
+
 }
