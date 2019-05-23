@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 6376372947671011302}
   - component: {fileID: 3706037307368518927}
   - component: {fileID: 2138809060452583342}
-  - component: {fileID: 5126489997779483161}
   - component: {fileID: 9487024769602217}
   - component: {fileID: 8636185105514467277}
+  - component: {fileID: 8258968923846208680}
   m_Layer: 0
   m_Name: Pawn
   m_TagString: Untagged
@@ -80,24 +80,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &5126489997779483161
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3846777463661710879}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed13b8bafb8a44d6da53a86d600ff7b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MoveDirections:
-  - {x: 1, y: 1}
-  continuous: 1
-  allDirections: 1
-  jumping: 1
-  team: 0
 --- !u!65 &9487024769602217
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -127,3 +109,16 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 122
   m_CollisionDetection: 0
+--- !u!114 &8258968923846208680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3846777463661710879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a3e30b5b517b45d3b0ebbcf20441138, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  team: 0

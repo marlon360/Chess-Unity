@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
-    public Material HighlightMaterial;
+    public Material MoveToMaterial;
+    public Material AttackAtMaterial;
     public Chessman chessman;
     public Vector2 position;
 
@@ -16,8 +17,11 @@ public class Tile : MonoBehaviour
         defaultMaterial = rend.material;
     }
 
-    public void SelectTile() {
-        rend.material = HighlightMaterial;
+    public void SelectMoveToTile() {
+        rend.material = MoveToMaterial;
+    }
+    public void SelectAttackAtTile() {
+        rend.material = AttackAtMaterial;
     }
 
     public void DeselectTile() {

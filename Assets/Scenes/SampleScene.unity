@@ -287,8 +287,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: -0.26557553, y: 0.0078065908, z: -0.0021505354, w: -0.9640561}
-  m_LocalPosition: {x: 3.7296352, y: 9.970455, z: -10.377712}
+  m_LocalRotation: {x: -0.58574116, y: 0.005347153, z: -0.0038644918, w: -0.81047136}
+  m_LocalPosition: {x: 3.5304744, y: 9.15342, z: 0.15606588}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -305,7 +305,7 @@ GameObject:
   - component: {fileID: 1862256538}
   - component: {fileID: 1862256537}
   m_Layer: 0
-  m_Name: Game
+  m_Name: Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -327,7 +327,12 @@ MonoBehaviour:
     type: 3}
   WhiteTile: {fileID: 4331700621797913953, guid: eb62905f8cf67406da010f08de1156cd,
     type: 3}
-  pawn: {fileID: 5126489997779483161, guid: 5e8c8548989b74a8e8e2a238384c7e8e, type: 3}
+  pawn: {fileID: 8258968923846208680, guid: 5e8c8548989b74a8e8e2a238384c7e8e, type: 3}
+  knight: {fileID: -8581893102760247699, guid: 99070035dff75426993daa73702b122c, type: 3}
+  king: {fileID: 2452096482914065677, guid: d27a51bf67085448a9ca2f8d350671be, type: 3}
+  queen: {fileID: -4396550216934176669, guid: 17d95f81ec9984cf98ef3c834c13994f, type: 3}
+  bishop: {fileID: 1407339808637128912, guid: 64e8b7d2512ae400ab42d221e15ca7c1, type: 3}
+  rook: {fileID: 5134949851541720995, guid: d26554eb0f4ea4bb799952c9b890f5cb, type: 3}
 --- !u!4 &1862256538
 Transform:
   m_ObjectHideFlags: 0
@@ -341,4 +346,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2072435858
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2072435860}
+  - component: {fileID: 2072435859}
+  m_Layer: 0
+  m_Name: GameManger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2072435859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2072435858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a61315e4b5c04631b621b8e2cdb9467, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grid: {fileID: 1862256537}
+  currentTeam: 1
+  selectedChessman: {fileID: 0}
+--- !u!4 &2072435860
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2072435858}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.4982462, y: 1.4517822, z: 3.9087248}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
