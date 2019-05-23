@@ -28,14 +28,14 @@ public class Grid : MonoBehaviour
 
         char[] alphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
 
-        for (int u = 0; u < 8; u++) {
-            for (int v = 0; v < 8; v++) {
-                Tile nextTile = (u + v) % 2 == 0 ? BlackTile : WhiteTile;
-                GameObject tile = GameObject.Instantiate(nextTile.gameObject, new Vector3(v, 0, u), Quaternion.identity, gameObject.transform);
-                tiles[u, v] = tile.GetComponent<Tile>();
-                string zAxis = (u+1).ToString();
-                string xAxis = alphabet[v].ToString();
-                tile.name = xAxis + zAxis;
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                Tile nextTile = (y + x) % 2 == 0 ? BlackTile : WhiteTile;
+                GameObject tile = GameObject.Instantiate(nextTile.gameObject, new Vector3(x, 0, y), Quaternion.identity, gameObject.transform);
+                tiles[x, y] = tile.GetComponent<Tile>();
+                string xAxis = alphabet[x].ToString();
+                string yAxis = (y+1).ToString();
+                tile.name = xAxis + yAxis;
             }
         }
 
@@ -46,14 +46,14 @@ public class Grid : MonoBehaviour
         // white
         for (int i = 0; i < 8; i++) {
             GameObject chessman = GameObject.Instantiate(pawn.gameObject);
-            Tile tile = tiles[1, i];
+            Tile tile = tiles[i, 1];
             chessman.GetComponent<Chessman>().SetTile(tile);
         }
 
         // black
         for (int i = 0; i < 8; i++) {
             GameObject chessman = GameObject.Instantiate(pawn.gameObject);
-            Tile tile = tiles[6, i];
+            Tile tile = tiles[i, 6];
             chessman.GetComponent<Chessman>().SetTile(tile);
         }
 
