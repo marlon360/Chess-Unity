@@ -93,6 +93,8 @@ public class ChessAgent : Agent {
             } else if (selectedChessman.CanMoveTo (destinationTile)) {
                 // move to tile
                 selectedChessman.SetTile (destinationTile);
+                // negative reward
+                AddReward (-0.005f);
                 // change team
                 GameManager.instance.ChangeTeam ();
             } else {
