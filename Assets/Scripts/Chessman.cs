@@ -11,20 +11,36 @@ public abstract class Chessman : MonoBehaviour {
 
     public Tile currentTile;
 
+    public float reward = 1;
+
+    private bool moving = false;
+    private Vector3 destination;
+
     void Start () {
         rigid = GetComponent<Rigidbody> ();
     }
 
     public virtual void SetTile (Tile tile) {
-        transform.position = tile.transform.position + new Vector3 (0, 1, 0);
-        // if (tile.chessman != null) {
-        //     tile.chessman.Kill();
-        // }
+        //transform.position = tile.transform.position + new Vector3 (0, 1, 0);
         tile.chessman = this;
         if (currentTile != null) {
             currentTile.chessman = null;
         }
         currentTile = tile;
+        moving = true;
+        destination = tile.transform.position + new Vector3 (0, 1, 0);
+    }
+
+    void Update () {
+        if (moving) {
+            rigid.useGravity = false;
+            transform.position = Vector3.Lerp (transform.position, destination, Time.deltaTime * 5f);
+            if (Vector2.Distance (new Vector2(transform.position.x, transform.position.z), new Vector2(destination.x, destination.z)) < 0.1f) {
+                moving = false;
+                transform.position = destination;
+                rigid.useGravity = true;
+            }
+        }
     }
 
     public void Select () {
@@ -33,9 +49,9 @@ public abstract class Chessman : MonoBehaviour {
         transform.position = transform.position + new Vector3 (0, 1, 0);
     }
 
-    public bool CanMoveTo(Tile destinationTile) {
+    public bool CanMoveTo (Tile destinationTile) {
         bool canMove = false;
-        GetMoveToTiles().ForEach((Tile tile) => {
+        GetMoveToTiles ().ForEach ((Tile tile) => {
             if (tile == destinationTile) {
                 canMove = true;
             }
@@ -43,9 +59,9 @@ public abstract class Chessman : MonoBehaviour {
         return canMove;
     }
 
-    public bool CanAttackAt(Tile destinationTile) {
+    public bool CanAttackAt (Tile destinationTile) {
         bool canAttack = false;
-        GetAttackAtTiles().ForEach((Tile tile) => {
+        GetAttackAtTiles ().ForEach ((Tile tile) => {
             if (tile == destinationTile) {
                 canAttack = true;
             }
@@ -58,8 +74,8 @@ public abstract class Chessman : MonoBehaviour {
         rigid.useGravity = true;
     }
 
-    public void Kill() {
-        Destroy(gameObject);
+    public void Kill () {
+        Destroy (gameObject);
     }
 
     public abstract List<Tile> GetMoveToTiles ();

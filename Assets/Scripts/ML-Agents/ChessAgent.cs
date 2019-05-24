@@ -7,89 +7,144 @@ public class ChessAgent : Agent {
 
     public Team team;
 
-    public override void InitializeAgent () {
+    private List<int> notSelectable = new List<int> ();
+    private List<int> notMovable = new List<int> ();
 
+    public void TileObservation (int x, int y) {
+        Tile tile = GameManager.instance.grid.GetTile (x, y);
+        if (tile.chessman == null) {
+            notSelectable.Add (PositionToIndex (x, y));
+            AddVectorObs (0);
+        } else if (tile.chessman.team == team) {
+            notMovable.Add (PositionToIndex (x, y));
+            if (tile.chessman.GetComponent<Pawn> () != null) {
+                AddVectorObs (1);
+            } else if (tile.chessman.GetComponent<Rook> () != null) {
+                AddVectorObs (2);
+            } else if (tile.chessman.GetComponent<Knight> () != null) {
+                AddVectorObs (3);
+            } else if (tile.chessman.GetComponent<Bishop> () != null) {
+                AddVectorObs (4);
+            } else if (tile.chessman.GetComponent<Queen> () != null) {
+                AddVectorObs (5);
+            } else if (tile.chessman.GetComponent<King> () != null) {
+                AddVectorObs (6);
+            }
+        } else {
+            notSelectable.Add (PositionToIndex (x, y));
+            if (tile.chessman.GetComponent<Pawn> () != null) {
+                AddVectorObs (7);
+            } else if (tile.chessman.GetComponent<Rook> () != null) {
+                AddVectorObs (8);
+            } else if (tile.chessman.GetComponent<Knight> () != null) {
+                AddVectorObs (9);
+            } else if (tile.chessman.GetComponent<Bishop> () != null) {
+                AddVectorObs (10);
+            } else if (tile.chessman.GetComponent<Queen> () != null) {
+                AddVectorObs (11);
+            } else if (tile.chessman.GetComponent<King> () != null) {
+                AddVectorObs (12);
+            }
+        }
     }
 
     public override void CollectObservations () {
-        for (int x = 0; x < 8; x++) {
-            for (int y = 0; y < 8; y++) {
-                Tile tile = GameManager.instance.grid.GetTile(x, y);
-                if (tile.chessman == null) {
-                    AddVectorObs(0);
-                } else if (tile.chessman.team == team) {
-                    AddVectorObs(1);
-                } else {
-                    AddVectorObs(2);
+        notSelectable.Clear();
+        notMovable.Clear();
+        if (team == Team.White) {
+            for (int x = 0; x < 8; x++) {
+                for (int y = 0; y < 8; y++) {
+                    TileObservation(x, y);
+                }
+            }
+        } else {
+            for (int x = 7; x >= 0; x--) {
+                for (int y = 7; y >= 0; y--) {
+                    TileObservation(x, y);
                 }
             }
         }
+        SetActionMask (0, notSelectable);
+        SetActionMask (1, notMovable);
     }
 
     // to be implemented by the developer
     public override void AgentAction (float[] vectorAction, string textAction) {
 
         int chessmanPositionIndex = Mathf.FloorToInt (vectorAction[0]);
-        Vector2 chessmanPosition = IndexToPosition(chessmanPositionIndex);
-        Tile chessmanTile = GameManager.instance.grid.GetTile(chessmanPosition);
+        Vector2 chessmanPosition = IndexToPosition (chessmanPositionIndex);
+        Tile chessmanTile = GameManager.instance.grid.GetTile (chessmanPosition);
 
         if (chessmanTile.chessman != null && chessmanTile.chessman.team == team) {
 
             Chessman selectedChessman = chessmanTile.chessman;
 
             int destinationPositionIndex = Mathf.FloorToInt (vectorAction[1]);
-            Vector2 destinationPosition = IndexToPosition(destinationPositionIndex);
-            Tile destinationTile = GameManager.instance.grid.GetTile(destinationPosition);
+            Vector2 destinationPosition = IndexToPosition (destinationPositionIndex);
+            Tile destinationTile = GameManager.instance.grid.GetTile (destinationPosition);
 
-            if (selectedChessman.CanAttackAt(destinationTile)) {
+            if (selectedChessman.CanAttackAt (destinationTile)) {
                 // kill enemy at tile
-                KillChessman(destinationTile.chessman);
+                KillChessman (destinationTile.chessman);
                 // move to this tile
-                selectedChessman.SetTile(destinationTile);
-                // add reward
-                AddReward(1);
+                selectedChessman.SetTile (destinationTile);
                 // change team
-                GameManager.instance.ChangeTeam();
-            } else if (selectedChessman.CanMoveTo(destinationTile)) {
+                GameManager.instance.ChangeTeam ();
+            } else if (selectedChessman.CanMoveTo (destinationTile)) {
                 // move to tile
-                selectedChessman.SetTile(destinationTile);
+                selectedChessman.SetTile (destinationTile);
                 // change team
-                GameManager.instance.ChangeTeam();
+                GameManager.instance.ChangeTeam ();
             } else {
-                AddReward(-0.01f);
-                RequestDecision();
+                //AddReward (-0.001f);
+                RequestDecision ();
             }
 
         } else {
-            AddReward(-0.01f);
-            RequestDecision();
+            //AddReward (-0.001f);
+            RequestDecision ();
         }
-        
 
-        
     }
 
-    public void KillChessman(Chessman chessman) {
-        if (chessman.GetComponent<King>() != null) {
-            GameManager.instance.GameOver(team);
+    public void KillChessman (Chessman chessman) {
+        if (chessman.team == Team.White) {
+            GameManager.instance.BlackAgent.AddReward (chessman.reward);
+            GameManager.instance.WhiteAgent.AddReward (-chessman.reward);
         } else {
-            chessman.Kill();
+            GameManager.instance.WhiteAgent.AddReward (chessman.reward);
+            GameManager.instance.BlackAgent.AddReward (-chessman.reward);
+        }
+        if (chessman.GetComponent<King> () != null) {
+            GameManager.instance.GameOver (team);
+        } else {
+            chessman.Kill ();
         }
     }
 
     // to be implemented by the developer
     public override void AgentReset () {
-        
+
     }
 
-    private Vector2 IndexToPosition(int index) {
-        int x = Mathf.FloorToInt(index / 8);
-        int y = index % 8;
-        // if (team == Team.Black) {
-        //     x = 7 - x;
-        //     y = 7 - y;
-        // }
-        return new Vector2(x, y);
+    private Vector2 IndexToPosition (int index) {
+        int x = index % 8;
+        int y = Mathf.FloorToInt (index / 8);
+        if (team == Team.Black) {
+            x = 7 - x;
+            y = 7 - y;
+        }
+        return new Vector2 (x, y);
+    }
+
+    private int PositionToIndex (int xPos, int yPos) {
+        if (team == Team.Black) {
+            xPos = 7 - xPos;
+            yPos = 7 - yPos;
+        }
+        int x = xPos;
+        int y = yPos * 8;
+        return x + y;
     }
 
 }

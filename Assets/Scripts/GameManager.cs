@@ -115,8 +115,10 @@ public class GameManager : MonoBehaviour {
     public void GameOver(Team winner) {
         if (winner == Team.Black) {
             BlackAgent.AddReward(10);
+            WhiteAgent.AddReward(-10);
         } else {
             WhiteAgent.AddReward(10);
+            BlackAgent.AddReward(-10);
         }
         BlackAgent.Done();
         WhiteAgent.Done();

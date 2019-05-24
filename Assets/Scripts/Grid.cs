@@ -52,7 +52,7 @@ public class Grid : MonoBehaviour {
     }
 
     public Chessman PlaceChessman (Chessman chessman, int x, int y, Team team) {
-        GameObject chessmanObject = GameObject.Instantiate (chessman.gameObject);
+        GameObject chessmanObject = GameObject.Instantiate (chessman.gameObject, new Vector3(x, 0, y), Quaternion.identity);
         chessmanObject.transform.parent = transform;
         if (team == Team.Black) {
             chessmanObject.GetComponent<Renderer>().material = BlackMaterial;
