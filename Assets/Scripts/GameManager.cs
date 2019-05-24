@@ -10,13 +10,21 @@ public class GameManager : MonoBehaviour {
     public Team currentTeam = Team.White;
     public Chessman selectedChessman;
 
+    public bool UseWhiteAgent = true;
     public ChessAgent WhiteAgent;
+    public bool UseBlackAgent = true;
     public ChessAgent BlackAgent;
 
     // Start is called before the first frame update
     void Start () {
         if (instance == null) {
             instance = this;
+        }
+        if (!UseWhiteAgent) {
+            WhiteAgent = null;
+        }
+        if (!UseBlackAgent) {
+            BlackAgent = null;
         }
         Reset();
     }
@@ -105,23 +113,23 @@ public class GameManager : MonoBehaviour {
     public void ChangeTeam() {
         if (currentTeam == Team.Black) {
             currentTeam = Team.White;
-            WhiteAgent.RequestDecision();
+            WhiteAgent?.RequestDecision();
         } else {
             currentTeam = Team.Black;
-            BlackAgent.RequestDecision();
+            BlackAgent?.RequestDecision();
         }
     }
 
     public void GameOver(Team winner) {
         if (winner == Team.Black) {
-            BlackAgent.AddReward(10);
-            WhiteAgent.AddReward(-10);
+            BlackAgent?.AddReward(10);
+            WhiteAgent?.AddReward(-10);
         } else {
-            WhiteAgent.AddReward(10);
-            BlackAgent.AddReward(-10);
+            WhiteAgent?.AddReward(10);
+            BlackAgent?.AddReward(-10);
         }
-        BlackAgent.Done();
-        WhiteAgent.Done();
+        BlackAgent?.Done();
+        WhiteAgent?.Done();
         Reset();
     }
 
@@ -130,7 +138,7 @@ public class GameManager : MonoBehaviour {
             Destroy(child.gameObject);
         }
         grid.Setup();
-        WhiteAgent.RequestDecision();
+        WhiteAgent?.RequestDecision();
     }
 
 

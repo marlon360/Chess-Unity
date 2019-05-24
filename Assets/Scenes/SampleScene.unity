@@ -548,7 +548,9 @@ MonoBehaviour:
   grid: {fileID: 1862256537}
   currentTeam: 1
   selectedChessman: {fileID: 0}
+  UseWhiteAgent: 1
   WhiteAgent: {fileID: 1008247803}
+  UseBlackAgent: 1
   BlackAgent: {fileID: 831565786}
 --- !u!4 &2072435860
 Transform:
