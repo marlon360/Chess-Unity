@@ -110,7 +110,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 0
   currentTile: {fileID: 0}
-  reward: 5
+  reward: 20
 --- !u!65 &6184666545350416340
 BoxCollider:
   m_ObjectHideFlags: 0

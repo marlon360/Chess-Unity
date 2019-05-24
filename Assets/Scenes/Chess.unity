@@ -308,7 +308,7 @@ MonoBehaviour:
     agentCameras: []
     agentRenderTextures: []
     maxStep: 0
-    resetOnDone: 0
+    resetOnDone: 1
     onDemandDecision: 1
     numberOfActionsBetweenDecisions: 1
   team: 0
@@ -443,7 +443,7 @@ MonoBehaviour:
     agentCameras: []
     agentRenderTextures: []
     maxStep: 0
-    resetOnDone: 0
+    resetOnDone: 1
     onDemandDecision: 1
     numberOfActionsBetweenDecisions: 1
   team: 1
