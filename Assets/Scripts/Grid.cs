@@ -14,10 +14,13 @@ public class Grid : MonoBehaviour {
     public Chessman bishop;
     public Chessman rook;
 
+    public Material WhiteMaterial;
+    public Material BlackMaterial;
+
     private Tile[, ] tiles = new Tile[8, 8];
 
     // Start is called before the first frame update
-    void Start () {
+    public void Setup () {
         SetupGrid ();
         SetupChessmen ();
     }
@@ -49,12 +52,17 @@ public class Grid : MonoBehaviour {
     }
 
     public Chessman PlaceChessman (Chessman chessman, int x, int y, Team team) {
-        GameObject pawnObject = GameObject.Instantiate (chessman.gameObject);
-        pawnObject.transform.parent = transform;
+        GameObject chessmanObject = GameObject.Instantiate (chessman.gameObject);
+        chessmanObject.transform.parent = transform;
+        if (team == Team.Black) {
+            chessmanObject.GetComponent<Renderer>().material = BlackMaterial;
+        } else {
+            chessmanObject.GetComponent<Renderer>().material = WhiteMaterial;
+        }
         Tile tile = tiles[x, y];
-        pawnObject.GetComponent<Chessman> ().SetTile (tile);
-        pawnObject.GetComponent<Chessman> ().team = team;
-        return pawnObject.GetComponent<Chessman> ();
+        chessmanObject.GetComponent<Chessman> ().SetTile (tile);
+        chessmanObject.GetComponent<Chessman> ().team = team;
+        return chessmanObject.GetComponent<Chessman> ();
     }
 
     void SetupChessmen () {

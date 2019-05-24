@@ -333,6 +333,8 @@ MonoBehaviour:
   queen: {fileID: -4396550216934176669, guid: 17d95f81ec9984cf98ef3c834c13994f, type: 3}
   bishop: {fileID: 1407339808637128912, guid: 64e8b7d2512ae400ab42d221e15ca7c1, type: 3}
   rook: {fileID: 5134949851541720995, guid: d26554eb0f4ea4bb799952c9b890f5cb, type: 3}
+  WhiteMaterial: {fileID: 2100000, guid: 1004c66fe7f8542e1aaca17843d69caf, type: 2}
+  BlackMaterial: {fileID: 2100000, guid: d682401a5599440ad8d19f3c707c6aec, type: 2}
 --- !u!4 &1862256538
 Transform:
   m_ObjectHideFlags: 0

@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour {
         if (instance == null) {
             instance = this;
         }
+        Reset();
     }
 
     public void SelectChessman (Chessman chessman) {
@@ -61,9 +62,9 @@ public class GameManager : MonoBehaviour {
             }
             if (chessman.team != currentTeam) {
                 if (selectedChessman.CanAttackAt(chessman.currentTile)) {
-                    chessman.Kill();
                     selectedChessman.SetTile(chessman.currentTile);
                     DeselectChessman();
+                    KillChessman(chessman);
                     ChangeTeam();
                 };
             }
@@ -77,17 +78,24 @@ public class GameManager : MonoBehaviour {
                 handleChessmanClick(tile.chessman);
             }
         } else {
-            if (selectedChessman.CanMoveTo(tile)) {
-                selectedChessman.SetTile(tile);
-                DeselectChessman();
-                ChangeTeam();
-            }
             if (selectedChessman.CanAttackAt(tile)) {
-                tile.chessman.Kill();
+                selectedChessman.SetTile(tile);
+                DeselectChessman();
+                KillChessman(tile.chessman);
+                ChangeTeam();
+            } else if (selectedChessman.CanMoveTo(tile)) {
                 selectedChessman.SetTile(tile);
                 DeselectChessman();
                 ChangeTeam();
             }
+        }
+    }
+
+    private void KillChessman(Chessman chessman) {
+        if (chessman.GetComponent<King>() != null) {
+            GameOver(currentTeam);
+        } else {
+            chessman.Kill();
         }
     }
 
@@ -98,5 +106,18 @@ public class GameManager : MonoBehaviour {
             currentTeam = Team.Black;
         }
     }
+
+    private void GameOver(Team winner) {
+        Debug.Log(winner + " won!");
+        Reset();
+    }
+
+    public void Reset() {
+        foreach (Transform child in grid.gameObject.transform) {
+            Destroy(child.gameObject);
+        }
+        grid.Setup();
+    }
+
 
 }
