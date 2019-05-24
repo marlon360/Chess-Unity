@@ -111,11 +111,11 @@ public class ChessAgent : Agent {
 
     public void KillChessman (Chessman chessman) {
         if (chessman.team == Team.White) {
-            GameManager.instance.BlackAgent.AddReward (chessman.reward);
-            GameManager.instance.WhiteAgent.AddReward (-chessman.reward + 0.5f);
+            GameManager.instance.BlackAgent?.AddReward (chessman.reward);
+            GameManager.instance.WhiteAgent?.AddReward (-chessman.reward + 0.5f);
         } else {
-            GameManager.instance.WhiteAgent.AddReward (chessman.reward);
-            GameManager.instance.BlackAgent.AddReward (-chessman.reward + 0.5f);
+            GameManager.instance.WhiteAgent?.AddReward (chessman.reward);
+            GameManager.instance.BlackAgent?.AddReward (-chessman.reward + 0.5f);
         }
         if (chessman.GetComponent<King> () != null) {
             GameManager.instance.GameOver (team);
