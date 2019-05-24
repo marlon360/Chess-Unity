@@ -29,10 +29,6 @@ public class Bishop : Chessman {
                     destPos = destPos + rotateMoveDirection;
                     destinationTile = GameManager.instance.grid.GetTile (destPos);
                 } else {
-                    // check if blocked by enemy
-                    if (destinationTile.chessman.team != team) {
-                        destinations.Add (destinationTile); // attack
-                    }
                     break;
                 }
             }

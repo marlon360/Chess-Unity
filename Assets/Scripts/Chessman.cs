@@ -17,6 +17,9 @@ public abstract class Chessman : MonoBehaviour {
 
     public virtual void SetTile (Tile tile) {
         transform.position = tile.transform.position + new Vector3 (0, 1, 0);
+        // if (tile.chessman != null) {
+        //     tile.chessman.Kill();
+        // }
         tile.chessman = this;
         if (currentTile != null) {
             currentTile.chessman = null;

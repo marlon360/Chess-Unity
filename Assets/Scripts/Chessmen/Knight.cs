@@ -31,11 +31,6 @@ public class Knight : Chessman {
                     // check if destination is empty
                     if (destinationTile.chessman == null) {
                         destinations.Add (destinationTile);
-                    } else {
-                        // check if blocked by enemy
-                        if (destinationTile.chessman.team != team) {
-                            destinations.Add (destinationTile); // attack
-                        }
                     }
                 }
             }

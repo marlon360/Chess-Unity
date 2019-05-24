@@ -37,11 +37,6 @@ public class Pawn : Chessman {
                 // check if destination is empty
                 if (destinationTile.chessman == null) {
                     destinations.Add (destinationTile);
-                } else {
-                    // check if blocked by enemy
-                    if (destinationTile.chessman.team != team) {
-                        destinations.Add (destinationTile); // attack
-                    }
                 }
             }
         }
@@ -71,9 +66,7 @@ public class Pawn : Chessman {
             // check if destination tile exists
             if (destinationTile != null) {
                 // check if destination is empty
-                if (destinationTile.chessman == null) {
-
-                } else {
+                if (destinationTile.chessman != null) {
                     // check if blocked by enemy
                     if (destinationTile.chessman.team != team) {
                         destinations.Add (destinationTile); // attack

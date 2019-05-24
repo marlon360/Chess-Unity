@@ -10,6 +10,9 @@ public class GameManager : MonoBehaviour {
     public Team currentTeam = Team.White;
     public Chessman selectedChessman;
 
+    public ChessAgent WhiteAgent;
+    public ChessAgent BlackAgent;
+
     // Start is called before the first frame update
     void Start () {
         if (instance == null) {
@@ -72,16 +75,16 @@ public class GameManager : MonoBehaviour {
 
     }
 
-    private void handleTileClick(Tile tile) {
+    public void handleTileClick(Tile tile) {
         if (selectedChessman == null) {
             if (tile.chessman != null) {
                 handleChessmanClick(tile.chessman);
             }
         } else {
             if (selectedChessman.CanAttackAt(tile)) {
+                KillChessman(tile.chessman);
                 selectedChessman.SetTile(tile);
                 DeselectChessman();
-                KillChessman(tile.chessman);
                 ChangeTeam();
             } else if (selectedChessman.CanMoveTo(tile)) {
                 selectedChessman.SetTile(tile);
@@ -91,7 +94,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    private void KillChessman(Chessman chessman) {
+    public void KillChessman(Chessman chessman) {
         if (chessman.GetComponent<King>() != null) {
             GameOver(currentTeam);
         } else {
@@ -99,16 +102,24 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    private void ChangeTeam() {
+    public void ChangeTeam() {
         if (currentTeam == Team.Black) {
             currentTeam = Team.White;
+            WhiteAgent.RequestDecision();
         } else {
             currentTeam = Team.Black;
+            BlackAgent.RequestDecision();
         }
     }
 
-    private void GameOver(Team winner) {
-        Debug.Log(winner + " won!");
+    public void GameOver(Team winner) {
+        if (winner == Team.Black) {
+            BlackAgent.AddReward(10);
+        } else {
+            WhiteAgent.AddReward(10);
+        }
+        BlackAgent.Done();
+        WhiteAgent.Done();
         Reset();
     }
 
@@ -117,6 +128,7 @@ public class GameManager : MonoBehaviour {
             Destroy(child.gameObject);
         }
         grid.Setup();
+        WhiteAgent.RequestDecision();
     }
 
 
