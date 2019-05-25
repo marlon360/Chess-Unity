@@ -111,11 +111,13 @@ public class ChessAgent : Agent {
                 KillChessman (destinationTile.chessman);
                 // move to this tile
                 selectedChessman.SetTile (destinationTile);
+                CanBeAttackedReward();
                 // change team
                 chessBoard.ChangeTeam ();
             } else if (selectedChessman.CanMoveTo (destinationTile)) {
                 // move to tile
                 selectedChessman.SetTile (destinationTile);
+                CanBeAttackedReward();
                 // negative reward
                 AddReward (-0.002f);
                 // change team
@@ -130,6 +132,17 @@ public class ChessAgent : Agent {
             RequestDecision ();
         }
 
+    }
+
+    void CanBeAttackedReward() {
+        // negative reward if chessman can be attacked
+        foreach (Chessman chessman in chessBoard.GetChessmenByTeam(team)) {
+            if (chessman.CanBeAttacked()) {
+                AddReward(-(chessman.reward/4));
+            } else {
+                AddReward((chessman.reward/16));
+            }
+        }
     }
 
     public void KillChessman (Chessman chessman) {

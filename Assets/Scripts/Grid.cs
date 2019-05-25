@@ -61,6 +61,16 @@ public class Grid : MonoBehaviour {
 
     }
 
+    public List<Chessman> GetChessmenByTeam(Team team) {
+        List<Chessman> chessmen = new List<Chessman>();
+        foreach (Tile tile in tiles) {
+            if (tile.chessman?.team == team) {
+                chessmen.Add(tile.chessman);
+            }
+        }
+        return chessmen;
+    }
+
     public Chessman PlaceChessman (Chessman chessman, int x, int y, Team team) {
         Vector3 pos = transform.position + new Vector3 (x, 0, y);
         GameObject chessmanObject = GameObject.Instantiate (chessman.gameObject, pos, Quaternion.identity);

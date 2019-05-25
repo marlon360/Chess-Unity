@@ -78,6 +78,16 @@ public abstract class Chessman : MonoBehaviour {
         return canAttack;
     }
 
+    public bool CanBeAttacked() {
+        List<Chessman> enemies = chessBoard.GetChessmenByTeam(team == Team.White ? Team.Black : Team.White);
+        foreach (Chessman enemy in enemies) {
+            if (enemy.CanAttackAt(currentTile)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void Deselect () {
         selected = false;
         rigid.useGravity = true;

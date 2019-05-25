@@ -34,6 +34,10 @@ public class ChessBoard : MonoBehaviour {
         return grid.GetTile (pos);
     }
 
+    public List<Chessman> GetChessmenByTeam(Team team) {
+        return grid.GetChessmenByTeam(team);
+    }
+
     public void SelectChessman (Chessman chessman) {
         selectedChessman = chessman;
         chessman.Select ();
