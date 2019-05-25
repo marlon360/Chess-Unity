@@ -159,7 +159,7 @@ MonoBehaviour:
     width: 80
     height: 80
     qualityLevel: 1
-    timeScale: 100
+    timeScale: 1
     targetFrameRate: -1
   inferenceConfiguration:
     width: 1280
@@ -312,6 +312,7 @@ MonoBehaviour:
     onDemandDecision: 1
     numberOfActionsBetweenDecisions: 1
   team: 0
+  DebugText: 
 --- !u!4 &831565787
 Transform:
   m_ObjectHideFlags: 0
@@ -447,6 +448,7 @@ MonoBehaviour:
     onDemandDecision: 1
     numberOfActionsBetweenDecisions: 1
   team: 1
+  DebugText: 
 --- !u!4 &1008247804
 Transform:
   m_ObjectHideFlags: 0

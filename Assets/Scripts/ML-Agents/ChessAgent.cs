@@ -10,6 +10,9 @@ public class ChessAgent : Agent {
     private List<int> notSelectable = new List<int> ();
     private List<int> notMovable = new List<int> ();
 
+    [Multiline (8)]
+    public string DebugText;
+
     public void TileObservation (int x, int y) {
         Tile tile = GameManager.instance.grid.GetTile (x, y);
         if (tile.chessman == null) {
@@ -46,21 +49,35 @@ public class ChessAgent : Agent {
                 AddVectorObs (12);
             }
         }
+        DebugVectorObservation ();
+    }
+
+    public void DebugVectorObservation () {
+        DebugText = "";
+        if (info.vectorObservation.Count == 64) {
+            for (int y = 7; y >= 0; y--) {
+                for (int x = 0; x < 8; x++) {
+                    int index = y * 8 + x;
+                    DebugText += info.vectorObservation[index] + " ";
+                }
+                DebugText += "\n";
+            }
+        }
     }
 
     public override void CollectObservations () {
-        notSelectable.Clear();
-        notMovable.Clear();
+        notSelectable.Clear ();
+        notMovable.Clear ();
         if (team == Team.White) {
             for (int x = 0; x < 8; x++) {
                 for (int y = 0; y < 8; y++) {
-                    TileObservation(x, y);
+                    TileObservation (y, x);
                 }
             }
         } else {
             for (int x = 7; x >= 0; x--) {
                 for (int y = 7; y >= 0; y--) {
-                    TileObservation(x, y);
+                    TileObservation (y, x);
                 }
             }
         }
@@ -94,16 +111,16 @@ public class ChessAgent : Agent {
                 // move to tile
                 selectedChessman.SetTile (destinationTile);
                 // negative reward
-                AddReward (-0.005f);
+                AddReward (-0.002f);
                 // change team
                 GameManager.instance.ChangeTeam ();
             } else {
-                //AddReward (-0.001f);
+                AddReward (-0.005f);
                 RequestDecision ();
             }
 
         } else {
-            //AddReward (-0.001f);
+            AddReward (-0.005f);
             RequestDecision ();
         }
 
