@@ -19,8 +19,17 @@ public class Grid : MonoBehaviour {
 
     private Tile[, ] tiles = new Tile[8, 8];
 
+    private ChessBoard chessBoard;
+
+    void Start() {
+        chessBoard = GetComponentInParent<ChessBoard>();
+    }
+
     // Start is called before the first frame update
     public void Setup () {
+        if (chessBoard == null) {
+            Start();
+        }
         SetupGrid ();
         SetupChessmen ();
     }
@@ -38,7 +47,8 @@ public class Grid : MonoBehaviour {
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 Tile nextTile = (y + x) % 2 == 0 ? BlackTile : WhiteTile;
-                GameObject tileObject = GameObject.Instantiate (nextTile.gameObject, new Vector3 (x, 0, y), Quaternion.identity, gameObject.transform);
+                Vector3 pos = transform.position + new Vector3 (x, 0, y);
+                GameObject tileObject = GameObject.Instantiate (nextTile.gameObject, pos, Quaternion.identity, gameObject.transform);
                 Tile tile = tileObject.GetComponent<Tile> ();
                 tiles[x, y] = tile;
                 tile.position = new Vector2 (x, y);
@@ -52,7 +62,8 @@ public class Grid : MonoBehaviour {
     }
 
     public Chessman PlaceChessman (Chessman chessman, int x, int y, Team team) {
-        GameObject chessmanObject = GameObject.Instantiate (chessman.gameObject, new Vector3(x, 0, y), Quaternion.identity);
+        Vector3 pos = transform.position + new Vector3 (x, 0, y);
+        GameObject chessmanObject = GameObject.Instantiate (chessman.gameObject, pos, Quaternion.identity);
         chessmanObject.transform.parent = transform;
         if (team == Team.Black) {
             chessmanObject.GetComponent<Renderer>().material = BlackMaterial;
@@ -60,9 +71,11 @@ public class Grid : MonoBehaviour {
             chessmanObject.GetComponent<Renderer>().material = WhiteMaterial;
         }
         Tile tile = tiles[x, y];
-        chessmanObject.GetComponent<Chessman> ().SetTile (tile);
-        chessmanObject.GetComponent<Chessman> ().team = team;
-        return chessmanObject.GetComponent<Chessman> ();
+        Chessman chessmanInstance = chessmanObject.GetComponent<Chessman> ();
+        chessmanInstance.SetTile (tile);
+        chessmanInstance.SetChessBoard (chessBoard);
+        chessmanInstance.team = team;
+        return chessmanInstance;
     }
 
     void SetupChessmen () {

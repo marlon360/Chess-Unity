@@ -31,7 +31,7 @@ public class Pawn : Chessman {
             // calculate destination
             Vector2 destPos = currentPosition + moveDirection;
             // get tile at destination
-            Tile destinationTile = GameManager.instance.grid.GetTile (destPos);
+            Tile destinationTile = chessBoard.GetTile (destPos);
             // check if destination tile exists
             if (destinationTile != null) {
                 // check if destination is empty
@@ -62,7 +62,7 @@ public class Pawn : Chessman {
             // calculate destination
             Vector2 destPos = currentPosition + moveDirection;
             // get tile at destination
-            Tile destinationTile = GameManager.instance.grid.GetTile (destPos);
+            Tile destinationTile = chessBoard.GetTile (destPos);
             // check if destination tile exists
             if (destinationTile != null) {
                 // check if destination is empty

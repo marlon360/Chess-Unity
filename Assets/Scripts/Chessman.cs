@@ -13,11 +13,20 @@ public abstract class Chessman : MonoBehaviour {
 
     public float reward = 1;
 
+    protected ChessBoard chessBoard;
+
     private bool moving = false;
     private Vector3 destination;
 
     void Start () {
         rigid = GetComponent<Rigidbody> ();
+    }
+
+    public void SetChessBoard(ChessBoard board) {
+        chessBoard = board;
+    }
+    public ChessBoard GetChessBoard() {
+        return chessBoard;
     }
 
     public virtual void SetTile (Tile tile) {

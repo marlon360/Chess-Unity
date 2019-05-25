@@ -25,7 +25,7 @@ public class King : Chessman {
                 // calculate destination
                 Vector2 destPos = currentPosition + rotateMoveDirection;
                 // get tile at destination
-                Tile destinationTile = GameManager.instance.grid.GetTile (destPos);
+                Tile destinationTile = chessBoard.GetTile (destPos);
                 // check if destination tile exists
                 if (destinationTile != null) {
                     // check if destination is empty
@@ -60,7 +60,7 @@ public class King : Chessman {
                 // calculate destination
                 Vector2 destPos = currentPosition + rotateMoveDirection;
                 // get tile at destination
-                Tile destinationTile = GameManager.instance.grid.GetTile (destPos);
+                Tile destinationTile = chessBoard.GetTile (destPos);
                 // check if destination tile exists
                 if (destinationTile != null) {
                     // check if destination is empty

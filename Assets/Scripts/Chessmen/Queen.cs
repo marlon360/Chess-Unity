@@ -25,14 +25,14 @@ public class Queen : Chessman {
                 // calculate destination
                 Vector2 destPos = currentPosition + rotateMoveDirection;
                 // get tile at destination
-                Tile destinationTile = GameManager.instance.grid.GetTile (destPos);
+                Tile destinationTile = chessBoard.GetTile (destPos);
                 // check if destination tile exists
                 while (destinationTile != null) {
                     // check if destination is empty
                     if (destinationTile.chessman == null) {
                         destinations.Add (destinationTile);
                         destPos = destPos + rotateMoveDirection;
-                        destinationTile = GameManager.instance.grid.GetTile (destPos);
+                        destinationTile = chessBoard.GetTile (destPos);
                     } else {
                         break;
                     }
@@ -64,14 +64,14 @@ public class Queen : Chessman {
                 // calculate destination
                 Vector2 destPos = currentPosition + rotateMoveDirection;
                 // get tile at destination
-                Tile destinationTile = GameManager.instance.grid.GetTile (destPos);
+                Tile destinationTile = chessBoard.GetTile (destPos);
                 // check if destination tile exists
                 while (destinationTile != null) {
                     // check if destination is empty
                     if (destinationTile.chessman == null) {
                         //destinations.Add (destinationTile);
                         destPos = destPos + rotateMoveDirection;
-                        destinationTile = GameManager.instance.grid.GetTile (destPos);
+                        destinationTile = chessBoard.GetTile (destPos);
                     } else {
                         // check if blocked by enemy
                         if (destinationTile.chessman.team != team) {

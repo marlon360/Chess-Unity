@@ -10,11 +10,17 @@ public class ChessAgent : Agent {
     private List<int> notSelectable = new List<int> ();
     private List<int> notMovable = new List<int> ();
 
+    private ChessBoard chessBoard;
+
     [Multiline (8)]
     public string DebugText;
 
+    public override void InitializeAgent() {
+        chessBoard = GetComponentInParent<ChessBoard>();
+    }
+
     public void TileObservation (int x, int y) {
-        Tile tile = GameManager.instance.grid.GetTile (x, y);
+        Tile tile = chessBoard.GetTile (x, y);
         if (tile.chessman == null) {
             notSelectable.Add (PositionToIndex (x, y));
             AddVectorObs (0);
@@ -90,7 +96,7 @@ public class ChessAgent : Agent {
 
         int chessmanPositionIndex = Mathf.FloorToInt (vectorAction[0]);
         Vector2 chessmanPosition = IndexToPosition (chessmanPositionIndex);
-        Tile chessmanTile = GameManager.instance.grid.GetTile (chessmanPosition);
+        Tile chessmanTile = chessBoard.GetTile (chessmanPosition);
 
         if (chessmanTile.chessman != null && chessmanTile.chessman.team == team) {
 
@@ -98,7 +104,7 @@ public class ChessAgent : Agent {
 
             int destinationPositionIndex = Mathf.FloorToInt (vectorAction[1]);
             Vector2 destinationPosition = IndexToPosition (destinationPositionIndex);
-            Tile destinationTile = GameManager.instance.grid.GetTile (destinationPosition);
+            Tile destinationTile = chessBoard.GetTile (destinationPosition);
 
             if (selectedChessman.CanAttackAt (destinationTile)) {
                 // kill enemy at tile
@@ -106,14 +112,14 @@ public class ChessAgent : Agent {
                 // move to this tile
                 selectedChessman.SetTile (destinationTile);
                 // change team
-                GameManager.instance.ChangeTeam ();
+                chessBoard.ChangeTeam ();
             } else if (selectedChessman.CanMoveTo (destinationTile)) {
                 // move to tile
                 selectedChessman.SetTile (destinationTile);
                 // negative reward
                 AddReward (-0.002f);
                 // change team
-                GameManager.instance.ChangeTeam ();
+                chessBoard.ChangeTeam ();
             } else {
                 AddReward (-0.005f);
                 RequestDecision ();
@@ -128,14 +134,14 @@ public class ChessAgent : Agent {
 
     public void KillChessman (Chessman chessman) {
         if (chessman.team == Team.White) {
-            GameManager.instance.BlackAgent?.AddReward (chessman.reward);
-            GameManager.instance.WhiteAgent?.AddReward (-chessman.reward + 0.5f);
+            chessBoard.BlackAgent?.AddReward (chessman.reward);
+            chessBoard.WhiteAgent?.AddReward (-chessman.reward + 0.5f);
         } else {
-            GameManager.instance.WhiteAgent?.AddReward (chessman.reward);
-            GameManager.instance.BlackAgent?.AddReward (-chessman.reward + 0.5f);
+            chessBoard.WhiteAgent?.AddReward (chessman.reward);
+            chessBoard.BlackAgent?.AddReward (-chessman.reward + 0.5f);
         }
         if (chessman.GetComponent<King> () != null) {
-            GameManager.instance.GameOver (team);
+            chessBoard.GameOver (team);
         } else {
             chessman.Kill ();
         }
