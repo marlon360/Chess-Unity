@@ -73,7 +73,9 @@ public class Grid : MonoBehaviour {
 
     public Chessman PlaceChessman (Chessman chessman, int x, int y, Team team) {
         Vector3 pos = transform.position + new Vector3 (x, 0, y);
-        GameObject chessmanObject = GameObject.Instantiate (chessman.gameObject, pos, Quaternion.identity);
+        Quaternion rot;
+        rot = team == Team.White ? Quaternion.identity : Quaternion.Euler(0f,180f,0f);
+        GameObject chessmanObject = GameObject.Instantiate (chessman.gameObject, pos, rot);
         chessmanObject.transform.parent = transform;
         if (team == Team.Black) {
             chessmanObject.GetComponent<Renderer>().material = BlackMaterial;
