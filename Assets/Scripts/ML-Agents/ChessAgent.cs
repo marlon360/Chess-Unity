@@ -178,6 +178,7 @@ public class ChessAgent : Agent {
             chessBoard.BlackAgent?.AddReward (-(chessman.reward + 0.5f));
         }
         if (chessman.GetComponent<King> () != null) {
+            chessman.Kill ();
             chessBoard.GameOver (team);
         } else {
             chessman.Kill ();

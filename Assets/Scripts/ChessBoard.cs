@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ChessBoard : MonoBehaviour {
 
@@ -13,6 +14,8 @@ public class ChessBoard : MonoBehaviour {
     public ChessAgent BlackAgent;
 
     public bool gameOver = false;
+
+    public GameObject UI;
 
     private Grid grid;
 
@@ -134,18 +137,27 @@ public class ChessBoard : MonoBehaviour {
     public void GameOver (Team winner) {
         gameOver = true;
         if (winner == Team.Black) {
+            UI.GetComponentInChildren<Text>().text = "Black wins";
             BlackAgent?.AddReward (10);
             WhiteAgent?.AddReward (-10);
         } else {
+            UI.GetComponentInChildren<Text>().text = "White wins";
             WhiteAgent?.AddReward (10);
             BlackAgent?.AddReward (-10);
         }
         BlackAgent?.Done ();
         WhiteAgent?.Done ();
-        Reset ();
+        UI.SetActive(true);
+        StartCoroutine(ResetAfterDelay(5f));
+    }
+
+    IEnumerator ResetAfterDelay(float sec) {
+        yield return new WaitForSeconds(sec);
+        Reset();
     }
 
     public void Reset () {
+        UI.SetActive(false);
         foreach (Transform child in grid.gameObject.transform) {
             Destroy (child.gameObject);
         }
