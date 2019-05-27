@@ -1337,12 +1337,17 @@ PrefabInstance:
     - target: {fileID: 1608978507583709850, guid: aebb9f4cd96c9481db734e761c835a66,
         type: 3}
       propertyPath: UseWhiteAgent
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1608978507583709850, guid: aebb9f4cd96c9481db734e761c835a66,
         type: 3}
       propertyPath: UI
       value: 
       objectReference: {fileID: 149097364}
+    - target: {fileID: 1608978507583709850, guid: aebb9f4cd96c9481db734e761c835a66,
+        type: 3}
+      propertyPath: UseBlackAgent
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aebb9f4cd96c9481db734e761c835a66, type: 3}

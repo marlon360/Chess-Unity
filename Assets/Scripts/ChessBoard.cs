@@ -21,6 +21,12 @@ public class ChessBoard : MonoBehaviour {
 
     private Grid grid;
 
+
+    private Tile undoSelection;
+    private Tile undoDestination;
+    private bool undoFirstMove;
+    private GameObject undoKilled;
+
     // Start is called before the first frame update
     void Start () {
         grid = GetComponentInChildren<Grid> ();
@@ -116,6 +122,21 @@ public class ChessBoard : MonoBehaviour {
             Chessman selectedChessman = selectionTile.chessman;
 
             if (selectedChessman.CanAttackAt (destinationTile)) {
+
+                if (undoKilled != null) {
+                    Destroy(undoKilled);
+                    undoKilled = null;
+                }
+                undoKilled = Instantiate(destinationTile.chessman.gameObject);
+                undoKilled.SetActive(false);
+                undoSelection = destinationTile;
+                undoDestination = selectionTile;
+                if (selectedChessman.GetComponent<Pawn>() && selectedChessman.GetComponent<Pawn>().firstMove) {
+                    undoFirstMove = true;
+                } else {
+                    undoFirstMove = false;
+                }
+
                 // kill enemy at tile
                 KillChessman (destinationTile.chessman);
                 // move to this tile
@@ -123,6 +144,17 @@ public class ChessBoard : MonoBehaviour {
                     ChangeTeam ();
                 });
             } else if (selectedChessman.CanMoveTo (destinationTile)) {
+                if (undoKilled != null) {
+                    Destroy(undoKilled);
+                    undoKilled = null;
+                }
+                undoSelection = destinationTile;
+                undoDestination = selectionTile;
+                if (selectedChessman.GetComponent<Pawn>() && selectedChessman.GetComponent<Pawn>().firstMove) {
+                    undoFirstMove = true;
+                } else {
+                    undoFirstMove = false;
+                }
                 // move to tile
                 selectedChessman.SetTile (destinationTile, (Chessman chessman) => {
                     ChangeTeam ();
@@ -134,6 +166,18 @@ public class ChessBoard : MonoBehaviour {
             return false;
         }
         return true;
+    }
+
+    [ContextMenu("undo")]
+    public void Undo() {
+        if (undoKilled) {
+            undoKilled.SetActive(true);
+        }
+        undoSelection.chessman.SetTile(undoDestination, null, true);
+        if (undoDestination.chessman.GetComponent<Pawn>() != null) {
+            undoDestination.chessman.GetComponent<Pawn>().firstMove = undoFirstMove;
+        } 
+        ChangeTeam();
     }
 
     public List<Chessman> GetChessmenByTeam (Team team) {
