@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 8636185105514467277}
   - component: {fileID: 2452096482914065677}
   - component: {fileID: 6184666545350416340}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: King
-  m_TagString: Untagged
+  m_TagString: Chessman
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

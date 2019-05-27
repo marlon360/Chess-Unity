@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1216906551911336537}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.61, y: -1.58, z: 1.48}
+  m_LocalPosition: {x: 0.61, y: -1.2, z: 1.48}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_Children: []
   m_Father: {fileID: 1608978507583709851}
@@ -141,10 +141,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentTeam: 1
   selectedChessman: {fileID: 0}
-  UseWhiteAgent: 0
+  UseWhiteAgent: 1
   WhiteAgent: {fileID: 1608978508464774619}
-  UseBlackAgent: 0
+  UseBlackAgent: 1
   BlackAgent: {fileID: 1608978508691788282}
+  gameOver: 0
 --- !u!1 &1608978507698846136
 GameObject:
   m_ObjectHideFlags: 0

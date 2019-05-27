@@ -84,7 +84,7 @@ public class Grid : MonoBehaviour {
         }
         Tile tile = tiles[x, y];
         Chessman chessmanInstance = chessmanObject.GetComponent<Chessman> ();
-        chessmanInstance.SetTile (tile);
+        chessmanInstance.SetTile (tile, true);
         chessmanInstance.SetChessBoard (chessBoard);
         chessmanInstance.team = team;
         return chessmanInstance;

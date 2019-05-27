@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 9487024769602217}
   - component: {fileID: 8636185105514467277}
   - component: {fileID: 8258968923846208680}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Pawn
-  m_TagString: Untagged
+  m_TagString: Chessman
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -123,5 +123,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 0
   currentTile: {fileID: 0}
-  reward: 3
+  reward: 2
   firstMove: 0

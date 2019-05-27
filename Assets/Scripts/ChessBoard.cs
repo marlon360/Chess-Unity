@@ -12,6 +12,8 @@ public class ChessBoard : MonoBehaviour {
     public bool UseBlackAgent = true;
     public ChessAgent BlackAgent;
 
+    public bool gameOver = false;
+
     private Grid grid;
 
     // Start is called before the first frame update
@@ -85,7 +87,7 @@ public class ChessBoard : MonoBehaviour {
                     selectedChessman.SetTile (chessman.currentTile);
                     DeselectChessman ();
                     KillChessman (chessman);
-                    ChangeTeam ();
+                    //ChangeTeam ();
                 };
             }
         }
@@ -102,11 +104,11 @@ public class ChessBoard : MonoBehaviour {
                 KillChessman (tile.chessman);
                 selectedChessman.SetTile (tile);
                 DeselectChessman ();
-                ChangeTeam ();
+                //ChangeTeam ();
             } else if (selectedChessman.CanMoveTo (tile)) {
                 selectedChessman.SetTile (tile);
                 DeselectChessman ();
-                ChangeTeam ();
+                //ChangeTeam ();
             }
         }
     }
@@ -130,6 +132,7 @@ public class ChessBoard : MonoBehaviour {
     }
 
     public void GameOver (Team winner) {
+        gameOver = true;
         if (winner == Team.Black) {
             BlackAgent?.AddReward (10);
             WhiteAgent?.AddReward (-10);
@@ -147,6 +150,8 @@ public class ChessBoard : MonoBehaviour {
             Destroy (child.gameObject);
         }
         grid.Setup ();
+        currentTeam = Team.White;
+        gameOver = false;
         WhiteAgent?.RequestDecision ();
     }
 

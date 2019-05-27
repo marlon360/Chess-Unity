@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 1395275480659351605}
   - component: {fileID: 7941309614689856407}
   - component: {fileID: -8857224167212457225}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: BlackTile
-  m_TagString: Untagged
+  m_TagString: Grid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

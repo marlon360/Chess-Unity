@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 8636185105514467277}
   - component: {fileID: 1407339808637128912}
   - component: {fileID: -136696681864023606}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Bishop
-  m_TagString: Untagged
+  m_TagString: Chessman
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -110,7 +110,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 0
   currentTile: {fileID: 0}
-  reward: 5
+  reward: 3
 --- !u!65 &-136696681864023606
 BoxCollider:
   m_ObjectHideFlags: 0

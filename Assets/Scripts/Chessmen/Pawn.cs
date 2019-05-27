@@ -6,9 +6,11 @@ public class Pawn : Chessman {
 
     public bool firstMove;
 
-    public override void SetTile (Tile tile) {
-        base.SetTile(tile);
-        firstMove = false;
+    public override void SetTile (Tile tile, bool init = false) {
+        base.SetTile(tile, init);
+        if (!init) {
+            firstMove = false;
+        }
     }
 
     public override List<Tile> GetMoveToTiles () {

@@ -22,32 +22,39 @@ public abstract class Chessman : MonoBehaviour {
         rigid = GetComponent<Rigidbody> ();
     }
 
-    public void SetChessBoard(ChessBoard board) {
+    public void SetChessBoard (ChessBoard board) {
         chessBoard = board;
     }
-    public ChessBoard GetChessBoard() {
+    public ChessBoard GetChessBoard () {
         return chessBoard;
     }
 
-    public virtual void SetTile (Tile tile) {
-        //transform.position = tile.transform.position + new Vector3 (0, 1, 0);
+    public virtual void SetTile (Tile tile, bool init = false) {
         tile.chessman = this;
         if (currentTile != null) {
             currentTile.chessman = null;
         }
         currentTile = tile;
-        moving = true;
-        destination = tile.transform.position + new Vector3 (0, 1, 0);
+        if (init) {
+            transform.position = tile.transform.position + new Vector3 (0, 1, 0);
+        }
+        else {
+            moving = true;
+            destination = tile.transform.position + new Vector3 (0, 1, 0);
+        }
     }
 
-    void Update () {
+    void FixedUpdate () {
         if (moving) {
             rigid.useGravity = false;
-            transform.position = Vector3.Lerp (transform.position, destination, Time.deltaTime * 5f);
-            if (Vector2.Distance (new Vector2(transform.position.x, transform.position.z), new Vector2(destination.x, destination.z)) < 0.1f) {
+            transform.position = Vector3.Lerp (transform.position, destination, Time.fixedDeltaTime * 5f);
+            if (Vector2.Distance (new Vector2 (transform.position.x, transform.position.z), new Vector2 (destination.x, destination.z)) < 0.1f) {
                 moving = false;
                 transform.position = destination;
                 rigid.useGravity = true;
+                if (!chessBoard.gameOver) {
+                    chessBoard.ChangeTeam ();
+                }
             }
         }
     }
@@ -78,10 +85,10 @@ public abstract class Chessman : MonoBehaviour {
         return canAttack;
     }
 
-    public bool CanBeAttacked() {
-        List<Chessman> enemies = chessBoard.GetChessmenByTeam(team == Team.White ? Team.Black : Team.White);
+    public bool CanBeAttacked () {
+        List<Chessman> enemies = chessBoard.GetChessmenByTeam (team == Team.White ? Team.Black : Team.White);
         foreach (Chessman enemy in enemies) {
-            if (enemy.CanAttackAt(currentTile)) {
+            if (enemy.CanAttackAt (currentTile)) {
                 return true;
             }
         }
