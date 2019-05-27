@@ -16,14 +16,15 @@ public class Pawn : Chessman {
 
     public override List<Tile> GetMoveToTiles () {
 
+        int counter = 1;
+        if (firstMove) {
+            counter = 2;
+        }
         List<Tile> destinations = new List<Tile> ();
 
         Vector2 currentPosition = currentTile.position;
         List<Vector2> moveDirections = new List<Vector2>();
         moveDirections.Add(new Vector2 (0, 1));
-        if (firstMove) {
-            moveDirections.Add(new Vector2 (0, 2));
-        }
         for (int i = 0; i < moveDirections.Count; i++) {
             Vector2 moveDirection = moveDirections[i];
             // rotate move direction by 180 if black
@@ -36,10 +37,15 @@ public class Pawn : Chessman {
             // get tile at destination
             Tile destinationTile = chessBoard.GetTile (destPos);
             // check if destination tile exists
-            if (destinationTile != null) {
+            while (destinationTile != null && counter > 0) {
                 // check if destination is empty
                 if (destinationTile.chessman == null) {
                     destinations.Add (destinationTile);
+                    destPos = destPos + moveDirection;
+                    destinationTile = chessBoard.GetTile (destPos);
+                    counter--;
+                } else {
+                    break;
                 }
             }
         }
