@@ -67,7 +67,8 @@ public class ChessAgent : Agent {
         if (chessBoard.MakeMove (chessmanTile, destinationTile)) {
             AddReward (CanBeAttackedReward () - currentCanBeAttackedReward);
         } else {
-            RequestDecision ();
+            Debug.Log("CANNOT MOVE "+chessmanTile.name+ " Team: "+chessBoard.currentTeam);
+            //RequestDecision ();
         }
 
     }

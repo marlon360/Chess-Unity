@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,11 +22,7 @@ public class ChessBoard : MonoBehaviour {
 
     private Grid grid;
 
-
-    private Tile undoSelection;
-    private Tile undoDestination;
-    private bool undoFirstMove;
-    private GameObject undoKilled;
+    private Stack<ChessBoardHistoryEntry> history = new Stack<ChessBoardHistoryEntry> ();
 
     // Start is called before the first frame update
     void Start () {
@@ -45,6 +42,19 @@ public class ChessBoard : MonoBehaviour {
     }
     public Tile GetTile (Vector2 pos) {
         return grid.GetTile (pos);
+    }
+
+    public List<int> ValidMoves () {
+        List<int> mask = new List<int> ();
+        for (int i = 0; i < 64 * 64; i++) {
+            Tile[] tiles = IndexToTiles (i);
+            Tile selectionTile = tiles[0];
+            Tile destinationTile = tiles[1];
+            if (IsMoveValid (selectionTile, destinationTile)) {
+                mask.Add (i);
+            }
+        }
+        return mask;
     }
 
     public int TileObservation (int x, int y) {
@@ -115,50 +125,45 @@ public class ChessBoard : MonoBehaviour {
         return true;
     }
 
-    public bool MakeMove (Tile selectionTile, Tile destinationTile) {
+    public bool MakeMove (Tile selectionTile, Tile destinationTile, bool requestDecision = true, bool noAnimation = false) {
 
         if (selectionTile && selectionTile.chessman != null && selectionTile.chessman.team == currentTeam) {
-
             Chessman selectedChessman = selectionTile.chessman;
-
             if (selectedChessman.CanAttackAt (destinationTile)) {
-
-                if (undoKilled != null) {
-                    Destroy(undoKilled);
-                    undoKilled = null;
-                }
-                undoKilled = Instantiate(destinationTile.chessman.gameObject);
-                undoKilled.SetActive(false);
-                undoSelection = destinationTile;
-                undoDestination = selectionTile;
-                if (selectedChessman.GetComponent<Pawn>() && selectedChessman.GetComponent<Pawn>().firstMove) {
+                GameObject undoKilled = Instantiate (destinationTile.chessman.gameObject);
+                undoKilled.SetActive (false);
+                Tile undoSelection = destinationTile;
+                Tile undoDestination = selectionTile;
+                bool undoFirstMove = false;
+                if (selectedChessman.GetComponent<Pawn> () && selectedChessman.GetComponent<Pawn> ().firstMove) {
                     undoFirstMove = true;
-                } else {
-                    undoFirstMove = false;
                 }
+
+                ChessBoardHistoryEntry historyEntry = new ChessBoardHistoryEntry (undoSelection, undoDestination, undoFirstMove, undoKilled);
+                history.Push (historyEntry);
 
                 // kill enemy at tile
                 KillChessman (destinationTile.chessman);
                 // move to this tile
                 selectedChessman.SetTile (destinationTile, (Chessman chessman) => {
-                    ChangeTeam ();
-                });
+                    ChangeTeam (requestDecision);
+                }, noAnimation);
             } else if (selectedChessman.CanMoveTo (destinationTile)) {
-                if (undoKilled != null) {
-                    Destroy(undoKilled);
-                    undoKilled = null;
-                }
-                undoSelection = destinationTile;
-                undoDestination = selectionTile;
-                if (selectedChessman.GetComponent<Pawn>() && selectedChessman.GetComponent<Pawn>().firstMove) {
+
+                Tile undoSelection = destinationTile;
+                Tile undoDestination = selectionTile;
+                bool undoFirstMove = false;
+                if (selectedChessman.GetComponent<Pawn> () && selectedChessman.GetComponent<Pawn> ().firstMove) {
                     undoFirstMove = true;
-                } else {
-                    undoFirstMove = false;
                 }
+
+                ChessBoardHistoryEntry historyEntry = new ChessBoardHistoryEntry (undoSelection, undoDestination, undoFirstMove, null);
+                history.Push (historyEntry);
+
                 // move to tile
                 selectedChessman.SetTile (destinationTile, (Chessman chessman) => {
-                    ChangeTeam ();
-                });
+                    ChangeTeam (requestDecision);
+                }, noAnimation);
             } else {
                 return false;
             }
@@ -168,16 +173,38 @@ public class ChessBoard : MonoBehaviour {
         return true;
     }
 
-    [ContextMenu("undo")]
-    public void Undo() {
-        if (undoKilled) {
-            undoKilled.SetActive(true);
+    public bool MakeMove (int move, bool requestDecision, bool noAnimation = false) {
+        Tile[] tiles = IndexToTiles (move);
+        return MakeMove (tiles[0], tiles[1], requestDecision, noAnimation);
+    }
+
+    [ContextMenu ("undo")]
+    public void Undo () {
+        if (history.Count > 0) {
+            gameOver = false;
+            ChessBoardHistoryEntry undoStep = history.Pop ();
+            undoStep.undoSelection.chessman.SetTile (undoStep.undoDestination, null, true);
+            if (undoStep.undoDestination.chessman.GetComponent<Pawn> () != null) {
+                undoStep.undoDestination.chessman.GetComponent<Pawn> ().firstMove = undoStep.undoFirstMove;
+            }
+            if (undoStep.undoKilled != null) {
+                undoStep.undoKilled.transform.parent = grid.transform;
+                undoStep.undoKilled.SetActive (true);
+                undoStep.undoSelection.chessman = undoStep.undoKilled.GetComponent<Chessman>(); 
+                undoStep.undoKilled.GetComponent<Chessman>().SetChessBoard(this);
+            }
+            ChangeTeam (false);
         }
-        undoSelection.chessman.SetTile(undoDestination, null, true);
-        if (undoDestination.chessman.GetComponent<Pawn>() != null) {
-            undoDestination.chessman.GetComponent<Pawn>().firstMove = undoFirstMove;
-        } 
-        ChangeTeam();
+    }
+
+    public void ClearHistory() {
+        while (history.Count > 0) {
+            ChessBoardHistoryEntry undoStep = history.Pop ();
+            if (undoStep.undoKilled != null) {
+                Destroy(undoStep.undoKilled);
+            }
+        }
+        history = new Stack<ChessBoardHistoryEntry>();
     }
 
     public List<Chessman> GetChessmenByTeam (Team team) {
@@ -227,11 +254,11 @@ public class ChessBoard : MonoBehaviour {
                 DeselectChessman ();
             }
             if (chessman.team != currentTeam) {
-                if (MakeMove(selectedChessman.currentTile, chessman.currentTile)) {
-                    DeselectChessman();
+                if (MakeMove (selectedChessman.currentTile, chessman.currentTile)) {
+                    DeselectChessman ();
                 }
             }
-        } 
+        }
     }
 
     public void handleTileClick (Tile tile) {
@@ -240,13 +267,14 @@ public class ChessBoard : MonoBehaviour {
                 handleChessmanClick (tile.chessman);
             }
         } else {
-            if (MakeMove(selectedChessman.currentTile, tile)) {
-                DeselectChessman();
+            if (MakeMove (selectedChessman.currentTile, tile)) {
+                DeselectChessman ();
             };
         }
     }
 
     public void KillChessman (Chessman chessman) {
+        Debug.Log("Kill");
         OnChessmanKilled.Notify (chessman);
         chessman.Kill ();
         if (chessman.GetComponent<King> () != null) {
@@ -254,13 +282,31 @@ public class ChessBoard : MonoBehaviour {
         }
     }
 
-    public void ChangeTeam () {
+    public void ChangeTeam (bool requestDecision = true) {
         if (!gameOver) {
             if (currentTeam == Team.Black) {
                 currentTeam = Team.White;
-                WhiteAgent?.RequestDecision ();
+                if (requestDecision) {
+                    WhiteAgent?.RequestDecision ();
+                }
             } else {
                 currentTeam = Team.Black;
+                if (requestDecision) {
+                    BlackAgent?.RequestDecision ();
+                }
+            }
+        }
+    }
+
+    public void SetTeam (Team team, bool requestDecision = true) {
+        if (team != Team.Black) {
+            currentTeam = Team.White;
+            if (requestDecision) {
+                WhiteAgent?.RequestDecision ();
+            }
+        } else {
+            currentTeam = Team.Black;
+            if (requestDecision) {
                 BlackAgent?.RequestDecision ();
             }
         }
@@ -286,6 +332,34 @@ public class ChessBoard : MonoBehaviour {
     IEnumerator ResetAfterDelay (float sec) {
         yield return new WaitForSeconds (sec);
         Reset ();
+    }
+
+    public Tile[] IndexToTiles (int index) {
+
+        int x1 = Mathf.FloorToInt ((((index % 512) % 64) % 8));
+        int y1 = Mathf.FloorToInt (((index % 512) % 64) / 8);
+        int x2 = Mathf.FloorToInt ((index % 512) / 64);
+        int y2 = Mathf.FloorToInt (index / 512);
+
+        Tile tile1 = GetTile (x1, y1);
+        Tile tile2 = GetTile (x2, y2);
+
+        if (currentTeam == Team.Black) {
+            tile1 = MirroredTile (tile1);
+            tile2 = MirroredTile (tile2);
+        }
+
+        return new Tile[] { tile1, tile2 };
+
+    }
+
+    public Tile MirroredTile (Tile tile) {
+
+        int x = 7 - Mathf.FloorToInt (tile.position.x);
+        int y = 7 - Mathf.FloorToInt (tile.position.y);
+
+        return GetTile (x, y);
+
     }
 
     public void Reset () {

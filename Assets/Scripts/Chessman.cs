@@ -39,7 +39,7 @@ public abstract class Chessman : MonoBehaviour {
         }
         currentTile = tile;
         if (init) {
-            transform.position = tile.transform.position + new Vector3 (0, 1, 0);
+            transform.position = tile.transform.position;
         }
         else {
             moving = true;
