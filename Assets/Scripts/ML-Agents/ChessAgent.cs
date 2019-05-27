@@ -17,6 +17,7 @@ public class ChessAgent : Agent {
 
     public override void InitializeAgent () {
         chessBoard = GetComponentInParent<ChessBoard> ();
+        chessBoard.OnChessmanKilled.AddObserver(KillChessman);
     }
 
     public List<int> CreateMask () {
@@ -26,62 +27,11 @@ public class ChessAgent : Agent {
             Tile[] tiles = IndexToTiles (i);
             Tile selectionTile = tiles[0];
             Tile destinationTile = tiles[1];
-            if (IsMoveValid (selectionTile, destinationTile)) {
+            if (chessBoard.IsMoveValid (selectionTile, destinationTile)) {
                 mask.Remove (i);
             }
         }
         return mask;
-    }
-
-    private bool IsMoveValid (Tile selectionTile, Tile destinationTile) {
-        if (selectionTile.chessman == null) {
-            return false;
-        }
-        if (selectionTile.chessman.team != team) {
-            return false;
-        }
-        if (!selectionTile.chessman.CanAttackAt (destinationTile) && !selectionTile.chessman.CanMoveTo (destinationTile)) {
-            return false;
-        }
-        return true;
-    }
-
-    public void TileObservation (int x, int y) {
-
-        Tile tile = chessBoard.GetTile (x, y);
-        if (tile.chessman == null) {
-            AddVectorObs (0);
-        } else if (tile.chessman.team == team) {
-            notMovable.Add (PositionToIndex (x, y));
-            if (tile.chessman.GetComponent<Pawn> () != null) {
-                AddVectorObs (1);
-            } else if (tile.chessman.GetComponent<Rook> () != null) {
-                AddVectorObs (2);
-            } else if (tile.chessman.GetComponent<Knight> () != null) {
-                AddVectorObs (3);
-            } else if (tile.chessman.GetComponent<Bishop> () != null) {
-                AddVectorObs (4);
-            } else if (tile.chessman.GetComponent<Queen> () != null) {
-                AddVectorObs (5);
-            } else if (tile.chessman.GetComponent<King> () != null) {
-                AddVectorObs (6);
-            }
-        } else {
-            if (tile.chessman.GetComponent<Pawn> () != null) {
-                AddVectorObs (7);
-            } else if (tile.chessman.GetComponent<Rook> () != null) {
-                AddVectorObs (8);
-            } else if (tile.chessman.GetComponent<Knight> () != null) {
-                AddVectorObs (9);
-            } else if (tile.chessman.GetComponent<Bishop> () != null) {
-                AddVectorObs (10);
-            } else if (tile.chessman.GetComponent<Queen> () != null) {
-                AddVectorObs (11);
-            } else if (tile.chessman.GetComponent<King> () != null) {
-                AddVectorObs (12);
-            }
-        }
-        DebugVectorObservation ();
     }
 
     public void DebugVectorObservation () {
@@ -98,19 +48,10 @@ public class ChessAgent : Agent {
     }
 
     public override void CollectObservations () {
-        if (team == Team.White) {
-            for (int x = 0; x < 8; x++) {
-                for (int y = 0; y < 8; y++) {
-                    TileObservation (y, x);
-                }
-            }
-        } else {
-            for (int x = 7; x >= 0; x--) {
-                for (int y = 7; y >= 0; y--) {
-                    TileObservation (y, x);
-                }
-            }
-        }
+        chessBoard.GetObservation ().ForEach ((int i) => {
+            AddVectorObs (i);
+        });
+        DebugVectorObservation ();
         SetActionMask (0, CreateMask ());
     }
 
@@ -120,33 +61,12 @@ public class ChessAgent : Agent {
         Tile[] tiles = IndexToTiles (Mathf.FloorToInt (vectorAction[0]));
 
         Tile chessmanTile = tiles[0];
+        Tile destinationTile = tiles[1];
+        float currentCanBeAttackedReward = CanBeAttackedReward ();
 
-        if (chessmanTile.chessman != null && chessmanTile.chessman.team == team) {
-
-            float currentCanBeAttackedReward = CanBeAttackedReward();
-
-            Chessman selectedChessman = chessmanTile.chessman;
-            Tile destinationTile = tiles[1];
-
-            if (selectedChessman.CanAttackAt (destinationTile)) {
-                // kill enemy at tile
-                KillChessman (destinationTile.chessman);
-                // move to this tile
-                selectedChessman.SetTile (destinationTile);
-                AddReward(CanBeAttackedReward () - currentCanBeAttackedReward);
-            } else if (selectedChessman.CanMoveTo (destinationTile)) {
-                // move to tile
-                selectedChessman.SetTile (destinationTile);
-                AddReward(CanBeAttackedReward () - currentCanBeAttackedReward);
-            } else {
-                //Debug.Log ("Cannot move");
-                AddReward (-0.005f);
-                RequestDecision ();
-            }
-
+        if (chessBoard.MakeMove (chessmanTile, destinationTile)) {
+            AddReward (CanBeAttackedReward () - currentCanBeAttackedReward);
         } else {
-            //Debug.Log ("Team "+team+": Cannot select " + chessmanTile.position.x + ", " + chessmanTile.position.y);
-            AddReward (-0.005f);
             RequestDecision ();
         }
 
@@ -176,12 +96,6 @@ public class ChessAgent : Agent {
         } else {
             chessBoard.WhiteAgent?.AddReward (chessman.reward);
             chessBoard.BlackAgent?.AddReward (-(chessman.reward + 0.5f));
-        }
-        if (chessman.GetComponent<King> () != null) {
-            chessman.Kill ();
-            chessBoard.GameOver (team);
-        } else {
-            chessman.Kill ();
         }
     }
 

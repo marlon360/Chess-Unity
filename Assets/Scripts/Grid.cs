@@ -21,14 +21,14 @@ public class Grid : MonoBehaviour {
 
     private ChessBoard chessBoard;
 
-    void Start() {
-        chessBoard = GetComponentInParent<ChessBoard>();
+    void Start () {
+        chessBoard = GetComponentInParent<ChessBoard> ();
     }
 
     // Start is called before the first frame update
     public void Setup () {
         if (chessBoard == null) {
-            Start();
+            Start ();
         }
         SetupGrid ();
         SetupChessmen ();
@@ -61,11 +61,11 @@ public class Grid : MonoBehaviour {
 
     }
 
-    public List<Chessman> GetChessmenByTeam(Team team) {
-        List<Chessman> chessmen = new List<Chessman>();
+    public List<Chessman> GetChessmenByTeam (Team team) {
+        List<Chessman> chessmen = new List<Chessman> ();
         foreach (Tile tile in tiles) {
             if (tile.chessman?.team == team) {
-                chessmen.Add(tile.chessman);
+                chessmen.Add (tile.chessman);
             }
         }
         return chessmen;
@@ -74,17 +74,17 @@ public class Grid : MonoBehaviour {
     public Chessman PlaceChessman (Chessman chessman, int x, int y, Team team) {
         Vector3 pos = transform.position + new Vector3 (x, 0, y);
         Quaternion rot;
-        rot = team == Team.White ? Quaternion.identity : Quaternion.Euler(0f,180f,0f);
+        rot = team == Team.White ? Quaternion.identity : Quaternion.Euler (0f, 180f, 0f);
         GameObject chessmanObject = GameObject.Instantiate (chessman.gameObject, pos, rot);
         chessmanObject.transform.parent = transform;
         if (team == Team.Black) {
-            chessmanObject.GetComponent<Renderer>().material = BlackMaterial;
+            chessmanObject.GetComponent<Renderer> ().material = BlackMaterial;
         } else {
-            chessmanObject.GetComponent<Renderer>().material = WhiteMaterial;
+            chessmanObject.GetComponent<Renderer> ().material = WhiteMaterial;
         }
         Tile tile = tiles[x, y];
         Chessman chessmanInstance = chessmanObject.GetComponent<Chessman> ();
-        chessmanInstance.SetTile (tile, true);
+        chessmanInstance.SetTile (tile, null, true);
         chessmanInstance.SetChessBoard (chessBoard);
         chessmanInstance.team = team;
         return chessmanInstance;
@@ -94,32 +94,31 @@ public class Grid : MonoBehaviour {
 
         // white
         for (int i = 0; i < 8; i++) {
-            Pawn pawnComp = PlaceChessman(pawn, i, 1, Team.White) as Pawn;
+            Pawn pawnComp = PlaceChessman (pawn, i, 1, Team.White) as Pawn;
             pawnComp.firstMove = true;
         }
-        PlaceChessman(rook, 0, 0, Team.White);
-        PlaceChessman(knight, 1, 0, Team.White);
-        PlaceChessman(bishop, 2, 0, Team.White);
-        PlaceChessman(queen, 3, 0, Team.White);
-        PlaceChessman(king, 4, 0, Team.White);
-        PlaceChessman(bishop, 5, 0, Team.White);
-        PlaceChessman(knight, 6, 0, Team.White);
-        PlaceChessman(rook, 7, 0, Team.White);
+        PlaceChessman (rook, 0, 0, Team.White);
+        PlaceChessman (knight, 1, 0, Team.White);
+        PlaceChessman (bishop, 2, 0, Team.White);
+        PlaceChessman (queen, 3, 0, Team.White);
+        PlaceChessman (king, 4, 0, Team.White);
+        PlaceChessman (bishop, 5, 0, Team.White);
+        PlaceChessman (knight, 6, 0, Team.White);
+        PlaceChessman (rook, 7, 0, Team.White);
 
         // black
         for (int i = 0; i < 8; i++) {
-            Pawn pawnComp = PlaceChessman(pawn, i, 6, Team.Black) as Pawn;
+            Pawn pawnComp = PlaceChessman (pawn, i, 6, Team.Black) as Pawn;
             pawnComp.firstMove = true;
         }
-        PlaceChessman(rook, 0, 7, Team.Black);
-        PlaceChessman(knight, 1, 7, Team.Black);
-        PlaceChessman(bishop, 2, 7, Team.Black);
-        PlaceChessman(king, 3, 7, Team.Black);
-        PlaceChessman(queen, 4, 7, Team.Black);
-        PlaceChessman(bishop, 5, 7, Team.Black);
-        PlaceChessman(knight, 6, 7, Team.Black);
-        PlaceChessman(rook, 7, 7, Team.Black);
-
+        PlaceChessman (rook, 0, 7, Team.Black);
+        PlaceChessman (knight, 1, 7, Team.Black);
+        PlaceChessman (bishop, 2, 7, Team.Black);
+        PlaceChessman (king, 3, 7, Team.Black);
+        PlaceChessman (queen, 4, 7, Team.Black);
+        PlaceChessman (bishop, 5, 7, Team.Black);
+        PlaceChessman (knight, 6, 7, Team.Black);
+        PlaceChessman (rook, 7, 7, Team.Black);
 
     }
 
@@ -139,5 +138,7 @@ public class Grid : MonoBehaviour {
             tile.DeselectTile ();
         }
     }
+
+    
 
 }

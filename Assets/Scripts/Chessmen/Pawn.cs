@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,8 +7,8 @@ public class Pawn : Chessman {
 
     public bool firstMove;
 
-    public override void SetTile (Tile tile, bool init = false) {
-        base.SetTile(tile, init);
+    public override void SetTile (Tile tile, Action<Chessman> callback = null, bool init = false) {
+        base.SetTile(tile, callback, init);
         if (!init) {
             firstMove = false;
         }

@@ -17,6 +17,8 @@ public class ChessBoard : MonoBehaviour {
 
     public GameObject UI;
 
+    public Subject<Chessman> OnChessmanKilled = new Subject<Chessman> ();
+
     private Grid grid;
 
     // Start is called before the first frame update
@@ -39,8 +41,103 @@ public class ChessBoard : MonoBehaviour {
         return grid.GetTile (pos);
     }
 
-    public List<Chessman> GetChessmenByTeam(Team team) {
-        return grid.GetChessmenByTeam(team);
+    public int TileObservation (int x, int y) {
+
+        Tile tile = GetTile (x, y);
+
+        if (tile.chessman == null) {
+            return (0);
+        } else if (tile.chessman.team == currentTeam) {
+            if (tile.chessman.GetComponent<Pawn> () != null) {
+                return (1);
+            } else if (tile.chessman.GetComponent<Rook> () != null) {
+                return (2);
+            } else if (tile.chessman.GetComponent<Knight> () != null) {
+                return (3);
+            } else if (tile.chessman.GetComponent<Bishop> () != null) {
+                return (4);
+            } else if (tile.chessman.GetComponent<Queen> () != null) {
+                return (5);
+            } else {
+                return (6);
+            }
+        } else {
+            if (tile.chessman.GetComponent<Pawn> () != null) {
+                return (7);
+            } else if (tile.chessman.GetComponent<Rook> () != null) {
+                return (8);
+            } else if (tile.chessman.GetComponent<Knight> () != null) {
+                return (9);
+            } else if (tile.chessman.GetComponent<Bishop> () != null) {
+                return (10);
+            } else if (tile.chessman.GetComponent<Queen> () != null) {
+                return (11);
+            } else {
+                return (12);
+            }
+        }
+    }
+
+    public List<int> GetObservation () {
+        List<int> observation = new List<int> ();
+        if (currentTeam == Team.White) {
+            for (int y = 0; y < 8; y++) {
+                for (int x = 0; x < 8; x++) {
+                    observation.Add (TileObservation (x, y));
+                }
+            }
+        } else {
+            for (int y = 7; y >= 0; y--) {
+                for (int x = 7; x >= 0; x--) {
+                    observation.Add (TileObservation (x, y));
+                }
+            }
+        }
+        return observation;
+    }
+
+    public bool IsMoveValid (Tile selectionTile, Tile destinationTile) {
+        if (selectionTile.chessman == null) {
+            return false;
+        }
+        if (selectionTile.chessman.team != currentTeam) {
+            return false;
+        }
+        if (!selectionTile.chessman.CanAttackAt (destinationTile) && !selectionTile.chessman.CanMoveTo (destinationTile)) {
+            return false;
+        }
+        return true;
+    }
+
+    public bool MakeMove (Tile selectionTile, Tile destinationTile) {
+
+        if (selectionTile && selectionTile.chessman != null && selectionTile.chessman.team == currentTeam) {
+
+            Chessman selectedChessman = selectionTile.chessman;
+
+            if (selectedChessman.CanAttackAt (destinationTile)) {
+                // kill enemy at tile
+                KillChessman (destinationTile.chessman);
+                // move to this tile
+                selectedChessman.SetTile (destinationTile, (Chessman chessman) => {
+                    ChangeTeam ();
+                });
+            } else if (selectedChessman.CanMoveTo (destinationTile)) {
+                // move to tile
+                selectedChessman.SetTile (destinationTile, (Chessman chessman) => {
+                    ChangeTeam ();
+                });
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    public List<Chessman> GetChessmenByTeam (Team team) {
+        return grid.GetChessmenByTeam (team);
     }
 
     public void SelectChessman (Chessman chessman) {
@@ -65,7 +162,7 @@ public class ChessBoard : MonoBehaviour {
                 GameObject hittedObject = hit.transform.gameObject;
                 Chessman chessman = hittedObject.GetComponent<Chessman> ();
                 Tile tile = hittedObject.GetComponent<Tile> ();
-                if (chessman && chessman.GetChessBoard() == this) {
+                if (chessman && chessman.GetChessBoard () == this) {
                     handleChessmanClick (chessman);
                 }
                 if (tile) {
@@ -86,15 +183,11 @@ public class ChessBoard : MonoBehaviour {
                 DeselectChessman ();
             }
             if (chessman.team != currentTeam) {
-                if (selectedChessman.CanAttackAt (chessman.currentTile)) {
-                    selectedChessman.SetTile (chessman.currentTile);
-                    DeselectChessman ();
-                    KillChessman (chessman);
-                    //ChangeTeam ();
-                };
+                if (MakeMove(selectedChessman.currentTile, chessman.currentTile)) {
+                    DeselectChessman();
+                }
             }
-        }
-
+        } 
     }
 
     public void handleTileClick (Tile tile) {
@@ -103,61 +196,56 @@ public class ChessBoard : MonoBehaviour {
                 handleChessmanClick (tile.chessman);
             }
         } else {
-            if (selectedChessman.CanAttackAt (tile)) {
-                KillChessman (tile.chessman);
-                selectedChessman.SetTile (tile);
-                DeselectChessman ();
-                //ChangeTeam ();
-            } else if (selectedChessman.CanMoveTo (tile)) {
-                selectedChessman.SetTile (tile);
-                DeselectChessman ();
-                //ChangeTeam ();
-            }
+            if (MakeMove(selectedChessman.currentTile, tile)) {
+                DeselectChessman();
+            };
         }
     }
 
     public void KillChessman (Chessman chessman) {
+        OnChessmanKilled.Notify (chessman);
+        chessman.Kill ();
         if (chessman.GetComponent<King> () != null) {
             GameOver (currentTeam);
-        } else {
-            chessman.Kill ();
         }
     }
 
     public void ChangeTeam () {
-        if (currentTeam == Team.Black) {
-            currentTeam = Team.White;
-            WhiteAgent?.RequestDecision ();
-        } else {
-            currentTeam = Team.Black;
-            BlackAgent?.RequestDecision ();
+        if (!gameOver) {
+            if (currentTeam == Team.Black) {
+                currentTeam = Team.White;
+                WhiteAgent?.RequestDecision ();
+            } else {
+                currentTeam = Team.Black;
+                BlackAgent?.RequestDecision ();
+            }
         }
     }
 
     public void GameOver (Team winner) {
         gameOver = true;
         if (winner == Team.Black) {
-            UI.GetComponentInChildren<Text>().text = "Black wins";
+            UI.GetComponentInChildren<Text> ().text = "Black wins";
             BlackAgent?.AddReward (10);
             WhiteAgent?.AddReward (-10);
         } else {
-            UI.GetComponentInChildren<Text>().text = "White wins";
+            UI.GetComponentInChildren<Text> ().text = "White wins";
             WhiteAgent?.AddReward (10);
             BlackAgent?.AddReward (-10);
         }
         BlackAgent?.Done ();
         WhiteAgent?.Done ();
-        UI.SetActive(true);
-        StartCoroutine(ResetAfterDelay(5f));
+        UI.SetActive (true);
+        StartCoroutine (ResetAfterDelay (5f));
     }
 
-    IEnumerator ResetAfterDelay(float sec) {
-        yield return new WaitForSeconds(sec);
-        Reset();
+    IEnumerator ResetAfterDelay (float sec) {
+        yield return new WaitForSeconds (sec);
+        Reset ();
     }
 
     public void Reset () {
-        UI.SetActive(false);
+        UI.SetActive (false);
         foreach (Transform child in grid.gameObject.transform) {
             Destroy (child.gameObject);
         }

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,6 +19,8 @@ public abstract class Chessman : MonoBehaviour {
     private bool moving = false;
     private Vector3 destination;
 
+    public Subject<Chessman> OnTileSet = new Subject<Chessman>();
+
     void Start () {
         rigid = GetComponent<Rigidbody> ();
     }
@@ -29,7 +32,7 @@ public abstract class Chessman : MonoBehaviour {
         return chessBoard;
     }
 
-    public virtual void SetTile (Tile tile, bool init = false) {
+    public virtual void SetTile (Tile tile, Action<Chessman> callback = null, bool init = false) {
         tile.chessman = this;
         if (currentTile != null) {
             currentTile.chessman = null;
@@ -41,6 +44,9 @@ public abstract class Chessman : MonoBehaviour {
         else {
             moving = true;
             destination = tile.transform.position + new Vector3 (0, 1, 0);
+            if (callback != null) {
+                OnTileSet.AddObserver(callback);
+            }
         }
     }
 
@@ -52,9 +58,8 @@ public abstract class Chessman : MonoBehaviour {
                 moving = false;
                 transform.position = destination;
                 rigid.useGravity = true;
-                if (!chessBoard.gameOver) {
-                    chessBoard.ChangeTeam ();
-                }
+                OnTileSet.Notify(this);
+                OnTileSet.ClearObservers();
             }
         }
     }
