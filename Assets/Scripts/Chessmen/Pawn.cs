@@ -5,19 +5,10 @@ using UnityEngine;
 
 public class Pawn : Chessman {
 
-    public bool firstMove;
-
-    public override void SetTile (Tile tile, Action<Chessman> callback = null, bool init = false) {
-        base.SetTile(tile, callback, init);
-        if (!init) {
-            firstMove = false;
-        }
-    }
-
     public override List<Tile> GetMoveToTiles () {
 
         int counter = 1;
-        if (firstMove) {
+        if ((team == Team.White && currentTile.position.y == 1) || (team == Team.Black && currentTile.position.y == 6)) {
             counter = 2;
         }
         List<Tile> destinations = new List<Tile> ();

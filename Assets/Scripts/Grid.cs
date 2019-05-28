@@ -92,32 +92,33 @@ public class Grid : MonoBehaviour {
 
     void SetupChessmen () {
 
-        // white
         for (int i = 0; i < 8; i++) {
-            Pawn pawnComp = PlaceChessman (pawn, i, 1, Team.White) as Pawn;
-            pawnComp.firstMove = true;
+            PlaceChessman (pawn, i, 1, Team.White);
+            PlaceChessman (pawn, i, 6, Team.Black);
         }
-        PlaceChessman (rook, 0, 0, Team.White);
-        PlaceChessman (knight, 1, 0, Team.White);
-        PlaceChessman (bishop, 2, 0, Team.White);
-        PlaceChessman (queen, 3, 0, Team.White);
-        PlaceChessman (king, 4, 0, Team.White);
-        PlaceChessman (bishop, 5, 0, Team.White);
-        PlaceChessman (knight, 6, 0, Team.White);
-        PlaceChessman (rook, 7, 0, Team.White);
 
-        // black
-        for (int i = 0; i < 8; i++) {
-            Pawn pawnComp = PlaceChessman (pawn, i, 6, Team.Black) as Pawn;
-            pawnComp.firstMove = true;
-        }
+        PlaceChessman (rook, 0, 0, Team.White);
         PlaceChessman (rook, 0, 7, Team.Black);
+
+        PlaceChessman (knight, 1, 0, Team.White);
         PlaceChessman (knight, 1, 7, Team.Black);
+
+        PlaceChessman (bishop, 2, 0, Team.White);
         PlaceChessman (bishop, 2, 7, Team.Black);
-        PlaceChessman (king, 3, 7, Team.Black);
+
+        PlaceChessman (queen, 3, 0, Team.White);
         PlaceChessman (queen, 4, 7, Team.Black);
+
+        PlaceChessman (king, 4, 0, Team.White);
+        PlaceChessman (king, 3, 7, Team.Black);
+
+        PlaceChessman (bishop, 5, 0, Team.White);
         PlaceChessman (bishop, 5, 7, Team.Black);
+
+        PlaceChessman (knight, 6, 0, Team.White);
         PlaceChessman (knight, 6, 7, Team.Black);
+
+        PlaceChessman (rook, 7, 0, Team.White);
         PlaceChessman (rook, 7, 7, Team.Black);
 
     }
