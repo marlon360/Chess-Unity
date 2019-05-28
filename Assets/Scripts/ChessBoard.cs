@@ -134,12 +134,8 @@ public class ChessBoard : MonoBehaviour {
                 undoKilled.SetActive (false);
                 Tile undoSelection = destinationTile;
                 Tile undoDestination = selectionTile;
-                bool undoFirstMove = false;
-                if (selectedChessman.GetComponent<Pawn> () && selectedChessman.GetComponent<Pawn> ().firstMove) {
-                    undoFirstMove = true;
-                }
 
-                ChessBoardHistoryEntry historyEntry = new ChessBoardHistoryEntry (undoSelection, undoDestination, undoFirstMove, undoKilled);
+                ChessBoardHistoryEntry historyEntry = new ChessBoardHistoryEntry (undoSelection, undoDestination, undoKilled);
                 history.Push (historyEntry);
 
                 // kill enemy at tile
@@ -152,12 +148,8 @@ public class ChessBoard : MonoBehaviour {
 
                 Tile undoSelection = destinationTile;
                 Tile undoDestination = selectionTile;
-                bool undoFirstMove = false;
-                if (selectedChessman.GetComponent<Pawn> () && selectedChessman.GetComponent<Pawn> ().firstMove) {
-                    undoFirstMove = true;
-                }
 
-                ChessBoardHistoryEntry historyEntry = new ChessBoardHistoryEntry (undoSelection, undoDestination, undoFirstMove, null);
+                ChessBoardHistoryEntry historyEntry = new ChessBoardHistoryEntry (undoSelection, undoDestination, null);
                 history.Push (historyEntry);
 
                 // move to tile
@@ -184,9 +176,6 @@ public class ChessBoard : MonoBehaviour {
             gameOver = false;
             ChessBoardHistoryEntry undoStep = history.Pop ();
             undoStep.undoSelection.chessman.SetTile (undoStep.undoDestination, null, true);
-            if (undoStep.undoDestination.chessman.GetComponent<Pawn> () != null) {
-                undoStep.undoDestination.chessman.GetComponent<Pawn> ().firstMove = undoStep.undoFirstMove;
-            }
             if (undoStep.undoKilled != null) {
                 undoStep.undoKilled.transform.parent = grid.transform;
                 undoStep.undoKilled.SetActive (true);
@@ -274,7 +263,6 @@ public class ChessBoard : MonoBehaviour {
     }
 
     public void KillChessman (Chessman chessman) {
-        Debug.Log("Kill");
         OnChessmanKilled.Notify (chessman);
         chessman.Kill ();
         if (chessman.GetComponent<King> () != null) {
