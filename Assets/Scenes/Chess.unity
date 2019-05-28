@@ -317,6 +317,7 @@ MonoBehaviour:
   broadcastHub:
     broadcastingBrains:
     - {fileID: 11400000, guid: 801ba3dc4fc6a462b9a494726b07d521, type: 2}
+    - {fileID: 11400000, guid: 8b8ec35c3c19a440490ed7a9af47033d, type: 2}
     _brainsToControl: []
   maxSteps: 0
   trainingConfiguration:
@@ -329,7 +330,7 @@ MonoBehaviour:
     width: 1280
     height: 720
     qualityLevel: 5
-    timeScale: 100
+    timeScale: 1
     targetFrameRate: 60
   resetParameters:
     resetParameters: []
@@ -745,7 +746,7 @@ PrefabInstance:
     - target: {fileID: 1608978507583709850, guid: aebb9f4cd96c9481db734e761c835a66,
         type: 3}
       propertyPath: UseWhiteAgent
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1608978507583709850, guid: aebb9f4cd96c9481db734e761c835a66,
         type: 3}

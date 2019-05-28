@@ -28,12 +28,12 @@ public class ChessDecision : Decision {
         }
         currentTeam = chessBoard.currentTeam;
 
-        int bestmove = GetBestMove (chessBoard);
+        int bestmove = GetBestMove (chessBoard, 2);
 
         float[] act = new float[brainParameters.vectorActionSize.Length];
         act[0] = bestmove;
-        chessBoard.SetTeam(currentTeam, false);
-        chessBoard.ClearHistory();
+        chessBoard.SetTeam (currentTeam, false);
+        chessBoard.ClearHistory ();
 
         //chessBoard.SetTeam(currentTeam == Team.White ? Team.Black : Team.White, false);
 
@@ -92,7 +92,7 @@ public class ChessDecision : Decision {
         for (int i = 0; i < newGameMoves.Count; i++) {
             int newGameMove = newGameMoves[i];
             if (game.MakeMove (newGameMove, false, true)) {
-                float value = Minimax (depth - 1, game, !isMaximisingPlayer);
+                float value = Minimax (depth - 1, game, -10000, 10000, !isMaximisingPlayer);
                 game.Undo ();
                 if (value >= bestMove) {
                     bestMove = value;
@@ -103,7 +103,7 @@ public class ChessDecision : Decision {
         return bestMoveFound;
     }
 
-    float Minimax (int depth, ChessBoard game, bool isMaximisingPlayer) {
+    float Minimax (int depth, ChessBoard game, float alpha, float beta, bool isMaximisingPlayer) {
         positionCount++;
         if (depth == 0) {
             return -1.0f * CalculateValue (game);
@@ -115,8 +115,12 @@ public class ChessDecision : Decision {
             float bestMove = -9999;
             for (int i = 0; i < newGameMoves.Count; i++) {
                 if (game.MakeMove (newGameMoves[i], false, true)) {
-                    bestMove = Mathf.Max (bestMove, Minimax (depth - 1, game, !isMaximisingPlayer));
+                    bestMove = Mathf.Max (bestMove, Minimax (depth - 1, game, alpha, beta, !isMaximisingPlayer));
                     game.Undo ();
+                    alpha = Mathf.Max (alpha, bestMove);
+                    if (beta <= alpha) {
+                        return bestMove;
+                    }
                 }
             }
             return bestMove;
@@ -124,8 +128,12 @@ public class ChessDecision : Decision {
             float bestMove = 9999;
             for (var i = 0; i < newGameMoves.Count; i++) {
                 if (game.MakeMove (newGameMoves[i], false, true)) {
-                    bestMove = Mathf.Min (bestMove, Minimax (depth - 1, game, !isMaximisingPlayer));
+                    bestMove = Mathf.Min (bestMove, Minimax (depth - 1, game, alpha, beta, !isMaximisingPlayer));
                     game.Undo ();
+                    beta = Mathf.Min (beta, bestMove);
+                    if (beta <= alpha) {
+                        return bestMove;
+                    }
                 }
             }
             return bestMove;
