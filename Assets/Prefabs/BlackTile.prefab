@@ -101,10 +101,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6698595549452011344}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5514d872d53fc48538a3ca472b43e27a, type: 3}
+  m_Script: {fileID: 11500000, guid: aaeb70558bdcf424e9e86f369e306a72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MoveToMaterial: {fileID: 2100000, guid: 6502f3bca7f3f43c29051ccdd7f57bc7, type: 2}
   AttackAtMaterial: {fileID: 2100000, guid: 9e5aec1acf8da4dbdaa45a3397d8c777, type: 2}
-  chessman: {fileID: 0}
   position: {x: 0, y: 0}

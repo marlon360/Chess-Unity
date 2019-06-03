@@ -6,8 +6,8 @@ public class Tile : MonoBehaviour
 {
     public Material MoveToMaterial;
     public Material AttackAtMaterial;
-    public Chessman chessman;
-    public Vector2 position;
+
+    public Vector2Int position;
 
     private Renderer rend;
     private Material defaultMaterial;

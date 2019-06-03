@@ -5,9 +5,11 @@ using UnityEngine;
 
 public class ChessDecision : Decision {
 
-    public ChessBoard chessBoard;
+    public ChessGame chessGame;
     public Team currentTeam;
+    public int depth = 3;
     private int positionCount = 0;
+    private ChessAcademy academy;
 
     /// <summary>
     /// Defines the decision-making logic of the agent. Given the information 
@@ -23,19 +25,23 @@ public class ChessDecision : Decision {
     /// <see cref="MakeMemory(List{float}, List{Texture2D}, float, bool, List{float})"/>
     /// </param>
     public override float[] Decide (List<float> vectorObs, List<Texture2D> visualObs, float reward, bool done, List<float> memory) {
-        if (chessBoard == null) {
-            chessBoard = FindObjectOfType<ChessBoard> ();
+        if (chessGame == null) {
+            chessGame = FindObjectOfType<ChessGame> ();
         }
-        currentTeam = chessBoard.currentTeam;
+        if (academy == null) {
+            academy = FindObjectOfType<ChessAcademy> ();
+        } else {
+            if (academy.resetParameters.ContainsKey("ai-depth")) {
+                depth =  Mathf.FloorToInt(academy.resetParameters["ai-depth"]);
+            }
+        }
+        currentTeam = chessGame.GetChess ().currentTeam;
 
-        int bestmove = GetBestMove (chessBoard, 2);
+        Move bestmove = ChessAI.GetBestMove (ObservationToChess(vectorObs), depth);
 
         float[] act = new float[brainParameters.vectorActionSize.Length];
-        act[0] = bestmove;
-        chessBoard.SetTeam (currentTeam, false);
-        chessBoard.ClearHistory ();
-
-        //chessBoard.SetTeam(currentTeam == Team.White ? Team.Black : Team.White, false);
+        act[0] = MoveToIndex (bestmove);
+        chessGame.GetChess ().currentTeam = currentTeam;
 
         return act;
     }
@@ -55,95 +61,75 @@ public class ChessDecision : Decision {
         return new List<float> ();
     }
 
-    public float CalculateValue (ChessBoard chessBoard) {
-        float result = 0;
+    public static int MoveToIndex (Move move) {
+
+        int x1 = move.start.x;
+        int y1 = move.start.y;
+        int x2 = move.end.x;
+        int y2 = move.end.y;
+
+        int index = x1 + y1 * 8 + x2 * 8 * 8 + y2 * 8 * 8 * 8;
+        return index;
+
+    }
+
+    private Piece IntToPiece (int i, Chess chess, Team currentTeam) {
+        if (i == -1) {
+            return null;
+        } else {
+            Team pieceTeam = currentTeam;
+            if (i > 6) {
+                pieceTeam = currentTeam == Team.Black ? Team.White : Team.Black;
+                i -= 6;
+            }
+            if (i == 1) {
+                return new Pawn (chess, pieceTeam);
+            } else if (i == 2) {
+                return new Rook (chess, pieceTeam);
+            } else if (i == 3) {
+                return new Knight (chess, pieceTeam);
+            } else if (i == 4) {
+                return new Bishop (chess, pieceTeam);
+            } else if (i == 5) {
+                return new Queen (chess, pieceTeam);
+            } else {
+                return new King (chess, pieceTeam);
+            }
+        }
+    }
+
+    public Chess ObservationToChess (List<float> observation) {
+        Chess chess = new Chess();
+        chess.currentTeam = currentTeam;
+        chess.state = new Piece[8,8];
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
-                Tile tile = chessBoard.GetTile (x, y);
-                if (tile.chessman == null) {
-                    result += 0;
-                } else {
-                    float multiplier = tile.chessman.team != currentTeam ? 1.0f : -1.0f;
-                    if (tile.chessman.GetComponent<Pawn> () != null) {
-                        result += 10 * multiplier;
-                    } else if (tile.chessman.GetComponent<Rook> () != null) {
-                        result += 50 * multiplier;
-                    } else if (tile.chessman.GetComponent<Knight> () != null) {
-                        result += 30 * multiplier;
-                    } else if (tile.chessman.GetComponent<Bishop> () != null) {
-                        result += 30 * multiplier;
-                    } else if (tile.chessman.GetComponent<Queen> () != null) {
-                        result += 90 * multiplier;
-                    } else if (tile.chessman.GetComponent<King> () != null) {
-                        result += 900 * multiplier;
-                    }
+                int pieceInt = Mathf.FloorToInt(observation[y * 8 + x]);
+                Piece piece = IntToPiece(pieceInt, chess, currentTeam);
+                if (piece != null) {
+                    piece.position = new Vector2Int(x, 7 - y);
                 }
+                chess.state[y, x] = piece;
             }
         }
-        return result;
+        return chess;
     }
 
-    int MinimaxRoot (int depth, ChessBoard game, bool isMaximisingPlayer) {
-
-        List<int> newGameMoves = game.ValidMoves ();
-        float bestMove = -9999;
-        int bestMoveFound = 0;
-
-        for (int i = 0; i < newGameMoves.Count; i++) {
-            int newGameMove = newGameMoves[i];
-            if (game.MakeMove (newGameMove, false, true)) {
-                float value = Minimax (depth - 1, game, -10000, 10000, !isMaximisingPlayer);
-                game.Undo ();
-                if (value >= bestMove) {
-                    bestMove = value;
-                    bestMoveFound = newGameMove;
+    public void DebugVectorObservation (Piece[,] state) {
+        string DebugText = "";
+            for (int y = 7; y >= 0; y--) {
+                for (int x = 0; x < 8; x++) {
+                    if (state[x,y] == null) {
+                        DebugText += " ---- ";
+                    } else {
+                        DebugText += state[x,y] + " ("+ state[x,y].position+") ";
+                    } 
                 }
+                DebugText += "\n";
             }
-        }
-        return bestMoveFound;
+        
+        Debug.Log(DebugText);
     }
 
-    float Minimax (int depth, ChessBoard game, float alpha, float beta, bool isMaximisingPlayer) {
-        positionCount++;
-        if (depth == 0) {
-            return -1.0f * CalculateValue (game);
-        }
-
-        List<int> newGameMoves = game.ValidMoves ();
-
-        if (isMaximisingPlayer) {
-            float bestMove = -9999;
-            for (int i = 0; i < newGameMoves.Count; i++) {
-                if (game.MakeMove (newGameMoves[i], false, true)) {
-                    bestMove = Mathf.Max (bestMove, Minimax (depth - 1, game, alpha, beta, !isMaximisingPlayer));
-                    game.Undo ();
-                    alpha = Mathf.Max (alpha, bestMove);
-                    if (beta <= alpha) {
-                        return bestMove;
-                    }
-                }
-            }
-            return bestMove;
-        } else {
-            float bestMove = 9999;
-            for (var i = 0; i < newGameMoves.Count; i++) {
-                if (game.MakeMove (newGameMoves[i], false, true)) {
-                    bestMove = Mathf.Min (bestMove, Minimax (depth - 1, game, alpha, beta, !isMaximisingPlayer));
-                    game.Undo ();
-                    beta = Mathf.Min (beta, bestMove);
-                    if (beta <= alpha) {
-                        return bestMove;
-                    }
-                }
-            }
-            return bestMove;
-        }
-    }
-
-    int GetBestMove (ChessBoard game, int depth = 2) {
-        positionCount = 0;
-        int bestMove = MinimaxRoot (depth, game, true);
-        return bestMove;
-    }
 
 }
