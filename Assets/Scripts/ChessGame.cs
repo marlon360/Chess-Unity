@@ -74,6 +74,9 @@ public class ChessGame : MonoBehaviour {
 
     [ContextMenu ("Render")]
     public void RenderState () {
+        if (chess.NoMovesPossible()) {
+            ShowGameOver (chess.currentTeam == Team.White ? Team.Black : Team.White);
+        }
         pieces = new PieceObject[8, 8];
         if (PieceParent != null) {
             Destroy (PieceParent);

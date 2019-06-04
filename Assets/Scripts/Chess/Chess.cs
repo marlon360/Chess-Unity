@@ -8,13 +8,8 @@ public class Chess {
     public Team currentTeam = Team.White;
     public Piece[, ] state = new Piece[8, 8];
 
-    public Subject<Team> OnGameOver = new Subject<Team>();
-    public Subject<Piece> OnKilled = new Subject<Piece>();
-    public Subject<Team> OnTeamChanged = new Subject<Team>();
-
     private Stack<Piece[, ]> history = new Stack<Piece[, ]> ();
     private bool gameOver = false;
-
 
     void Start () {
         currentTeam = Team.White;
@@ -75,9 +70,20 @@ public class Chess {
         }
         Piece startPiece = GetPiece (start);
         if (startPiece != null && startPiece.team == currentTeam) {
-            return startPiece.CanMoveTo (end);
+            Team team = currentTeam;
+            if (startPiece.CanMoveTo (end)) {
+                MakeMove (start, end);
+                if (GetKing (team).CanBeAttacked ()) {
+                    Undo();
+                    return false;
+                } else {
+                    Undo();
+                    return true;
+                }
+            }
+            return false;
         } else {
-            Debug.Log ("No Piece on " + start.x + ", " + start.y + " for team " + currentTeam);
+            //Debug.Log ("No Piece on " + start.x + ", " + start.y + " for team " + currentTeam);
             return false;
         }
     }
@@ -88,7 +94,7 @@ public class Chess {
 
     public void MakeMove (Vector2Int start, Vector2Int end) {
         Piece startPiece = GetPiece (start);
-        if (IsMoveValid (start, end)) {
+        //if (IsMoveValid (start, end)) {
             Piece[, ] oldState = CloneState (state);
             history.Push (oldState);
             Piece destinationPiece = GetPiece (end);
@@ -100,11 +106,11 @@ public class Chess {
             // pawn promotion
             if (startPiece is Pawn) {
                 if (end.y == 0 || end.y == 7) {
-                    SetPiece(new Queen(startPiece.chess, startPiece.team), end);
+                    SetPiece (new Queen (startPiece.chess, startPiece.team), end);
                 }
             }
             ChangeTeam ();
-        }
+        //}
     }
 
     public void MakeMove (Move move) {
@@ -112,32 +118,47 @@ public class Chess {
     }
 
     public Move[] GetValidMoves () {
+        Team team = currentTeam;
         List<Move> moves = new List<Move> ();
         foreach (Piece piece in state) {
-            if (piece != null && piece.team == currentTeam) {
+            if (piece != null && piece.team == team) {
                 foreach (Vector2Int destination in piece.GetValidDestinations ()) {
-                    moves.Add (new Move (piece.position, destination));
+                    Move move = new Move (piece.position, destination);
+                    if (IsMoveValid (move)) {
+                        moves.Add (move);
+                    }
                 }
             }
         }
+        
         return moves.ToArray ();
     }
 
+    public bool NoMovesPossible() {
+        return GetValidMoves().Length == 0;
+    }
+
+    private Piece GetKing (Team team) {
+        foreach (Piece piece in state) {
+            if (piece is King && piece.team == team) {
+                return piece;
+            }
+        }
+        return null;
+    }
+
     public void Kill (Piece piece) {
-        OnKilled.Notify(piece);
         if (piece is King) {
-            GameOver (OtherTeam(piece.team));
+            GameOver (OtherTeam (piece.team));
         }
     }
 
     public void GameOver (Team winner) {
         gameOver = true;
-        OnGameOver.Notify(winner);
     }
 
     public void ChangeTeam () {
-        currentTeam = OtherTeam(currentTeam);
-        OnTeamChanged.Notify(currentTeam);
+        currentTeam = OtherTeam (currentTeam);
     }
 
     public void Undo () {
@@ -166,7 +187,7 @@ public class Chess {
         return clonedState;
     }
 
-    private Team OtherTeam(Team team) {
+    private Team OtherTeam (Team team) {
         if (team == Team.Black) {
             return Team.White;
         } else {
@@ -174,14 +195,14 @@ public class Chess {
         }
     }
 
-    public Piece[] GetPiecesByTeam(Team team) {
-        List<Piece> pieces = new List<Piece>();
+    public Piece[] GetPiecesByTeam (Team team) {
+        List<Piece> pieces = new List<Piece> ();
         foreach (Piece piece in state) {
             if (piece != null && piece.team == team) {
-                pieces.Add(piece);
+                pieces.Add (piece);
             }
         }
-        return pieces.ToArray();
+        return pieces.ToArray ();
     }
 
 }

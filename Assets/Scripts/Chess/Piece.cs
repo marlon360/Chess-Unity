@@ -25,7 +25,14 @@ public abstract class Piece {
 
     public Vector2Int[] GetValidDestinations(Piece[,] state) {
         if (!IsGameOver(state)) {
-            return GetDestinations();
+            List<Vector2Int> destinations = new List<Vector2Int>();
+            Vector2Int pos = position;
+            foreach (Vector2Int dest in GetDestinations()) {
+                if (chess.IsMoveValid(pos, dest)) {
+                    destinations.Add(dest);
+                }
+            }
+            return destinations.ToArray();
         } else {
             return new Vector2Int[0];
         }
@@ -37,7 +44,7 @@ public abstract class Piece {
     public abstract Vector2Int[] GetDestinations(Piece[,] state);
 
     public bool CanMoveTo(Vector2Int destination) {
-        return GetValidDestinations(chess.state).Contains(destination);
+        return GetDestinations(chess.state).Contains(destination);
     }
 
     protected bool PositionOutOfBound(Vector2Int pos) {
