@@ -60,7 +60,7 @@ public class ChessAgent : Agent {
 
     private int PieceToInt (Piece piece) {
         if (piece == null) {
-            return -1;
+            return 0;
         } else {
             int value = 0;
             if (piece is Pawn) {
@@ -77,7 +77,7 @@ public class ChessAgent : Agent {
                 value = 6;
             }
             if (piece.team != team) {
-                value += 6;
+                value *= -1;
             }
             return value;
         }
@@ -99,11 +99,11 @@ public class ChessAgent : Agent {
 
         Move move = IndexToMove (Mathf.FloorToInt (vectorAction[0]));
 
-        float currentCanBeAttackedReward = CanBeAttackedReward ();
+        //float currentCanBeAttackedReward = CanBeAttackedReward ();
 
         if (chessGame.GetChess ().IsMoveValid (move)) {
             chessGame.MakeMove (move);
-            AddReward (CanBeAttackedReward () - currentCanBeAttackedReward);
+            //AddReward (CanBeAttackedReward () - currentCanBeAttackedReward);
         } else {
             Debug.Log (move);
             RequestDecision ();

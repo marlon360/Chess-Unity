@@ -74,13 +74,13 @@ public class ChessDecision : Decision {
     }
 
     private Piece IntToPiece (int i, Chess chess, Team currentTeam) {
-        if (i == -1) {
+        if (i == 0) {
             return null;
         } else {
             Team pieceTeam = currentTeam;
-            if (i > 6) {
+            if (i < 0) {
                 pieceTeam = currentTeam == Team.Black ? Team.White : Team.Black;
-                i -= 6;
+                i *= -1;
             }
             if (i == 1) {
                 return new Pawn (chess, pieceTeam);
