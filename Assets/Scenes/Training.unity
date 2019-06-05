@@ -863,7 +863,8 @@ MonoBehaviour:
     broadcastingBrains:
     - {fileID: 11400000, guid: 6a653be497a0743568deb77f27851b13, type: 2}
     - {fileID: 11400000, guid: cc83472db724d4a47bede5b4744feebb, type: 2}
-    _brainsToControl: []
+    _brainsToControl:
+    - {fileID: 11400000, guid: 6a653be497a0743568deb77f27851b13, type: 2}
   maxSteps: 100000000
   trainingConfiguration:
     width: 80
@@ -880,7 +881,7 @@ MonoBehaviour:
   resetParameters:
     resetParameters:
     - key: ai-depth
-      value: 1
+      value: 3
 --- !u!4 &2035409493
 Transform:
   m_ObjectHideFlags: 0
