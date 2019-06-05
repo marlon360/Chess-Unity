@@ -8,7 +8,8 @@ public class Chess {
     public Team currentTeam = Team.White;
     public Piece[, ] state = new Piece[8, 8];
 
-    private Stack<Piece[, ]> history = new Stack<Piece[, ]> ();
+    private Stack<ChessHistory> history = new Stack<ChessHistory> ();
+    private int movesWithoutKill = 0;
     private bool gameOver = false;
 
     void Start () {
@@ -74,10 +75,10 @@ public class Chess {
             if (startPiece.CanMoveTo (end)) {
                 MakeMove (start, end);
                 if (GetKing (team).CanBeAttacked ()) {
-                    Undo();
+                    Undo ();
                     return false;
                 } else {
-                    Undo();
+                    Undo ();
                     return true;
                 }
             }
@@ -94,23 +95,30 @@ public class Chess {
 
     public void MakeMove (Vector2Int start, Vector2Int end) {
         Piece startPiece = GetPiece (start);
-        //if (IsMoveValid (start, end)) {
-            Piece[, ] oldState = CloneState (state);
-            history.Push (oldState);
-            Piece destinationPiece = GetPiece (end);
-            if (destinationPiece != null) {
-                Kill (destinationPiece);
+        Piece[, ] oldState = CloneState (state);
+        ChessHistory newHistory = new ChessHistory ();
+        newHistory.state = oldState;
+        newHistory.movesWithoutKill = 0;
+        history.Push (newHistory);
+        Piece destinationPiece = GetPiece (end);
+        if (destinationPiece != null) {
+            Kill (destinationPiece);
+        } else {
+            movesWithoutKill++;
+        }
+        SetPiece (startPiece, end);
+        SetPiece (null, start);
+        // pawn promotion
+        if (startPiece is Pawn) {
+            if (end.y == 0 || end.y == 7) {
+                SetPiece (new Queen (startPiece.chess, startPiece.team), end);
             }
-            SetPiece (startPiece, end);
-            SetPiece (null, start);
-            // pawn promotion
-            if (startPiece is Pawn) {
-                if (end.y == 0 || end.y == 7) {
-                    SetPiece (new Queen (startPiece.chess, startPiece.team), end);
-                }
-            }
-            ChangeTeam ();
-        //}
+        }
+        if (movesWithoutKill >= 50) {
+            GameOver ();
+            return;
+        }
+        ChangeTeam ();
     }
 
     public void MakeMove (Move move) {
@@ -130,12 +138,12 @@ public class Chess {
                 }
             }
         }
-        
+
         return moves.ToArray ();
     }
 
-    public bool NoMovesPossible() {
-        return GetValidMoves().Length == 0;
+    public bool NoMovesPossible () {
+        return GetValidMoves ().Length == 0;
     }
 
     private Piece GetKing (Team team) {
@@ -148,12 +156,13 @@ public class Chess {
     }
 
     public void Kill (Piece piece) {
+        movesWithoutKill = 0;
         if (piece is King) {
-            GameOver (OtherTeam (piece.team));
+            GameOver ();
         }
     }
 
-    public void GameOver (Team winner) {
+    public void GameOver () {
         gameOver = true;
     }
 
@@ -163,8 +172,9 @@ public class Chess {
 
     public void Undo () {
         if (history.Count > 0) {
-            Piece[, ] newState = history.Pop ();
-            state = newState;
+            ChessHistory newState = history.Pop ();
+            state = newState.state;
+            movesWithoutKill = newState.movesWithoutKill;
             gameOver = false;
             ChangeTeam ();
         }

@@ -19,6 +19,7 @@ public class ChessAgent : Agent {
         chessGame = GetComponentInParent<ChessGame> ();
         chessGame.OnKilled.AddObserver (KillChessman);
         chessGame.OnGameOver.AddObserver (GameOver);
+        chessGame.OnDraw.AddObserver (Draw);
     }
 
     public List<int> CreateMask () {
@@ -89,6 +90,10 @@ public class ChessAgent : Agent {
         } else {
             AddReward(-10f);
         }
+        Done();
+    }
+
+    private void Draw(bool draw) {
         Done();
     }
 

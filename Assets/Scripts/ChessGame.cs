@@ -31,11 +31,14 @@ public class ChessGame : MonoBehaviour {
 
     private GameObject PieceParent;
 
-    public Subject<Team> OnTeamChanged = new Subject<Team>();
-    public Subject<Piece> OnKilled = new Subject<Piece>();
-    public Subject<Team> OnGameOver = new Subject<Team>();
+    private int movesWithoutKill = 0;
 
-    private void Awake() {
+    public Subject<Team> OnTeamChanged = new Subject<Team> ();
+    public Subject<Piece> OnKilled = new Subject<Piece> ();
+    public Subject<Team> OnGameOver = new Subject<Team> ();
+    public Subject<bool> OnDraw = new Subject<bool> ();
+
+    private void Awake () {
         gameOverText = GameOverCanvas.GetComponentInChildren<Text> ();
         GameOverCanvas.SetActive (false);
         chess = new Chess ();
@@ -46,14 +49,21 @@ public class ChessGame : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start () {
-        OnTeamChanged.Notify(chess.currentTeam);
+        OnTeamChanged.Notify (chess.currentTeam);
     }
 
     public void ShowGameOver (Team winner) {
         GameOverCanvas.SetActive (true);
         gameOverText.text = winner + " wins!";
-        OnGameOver.Notify(winner);
-        //StartCoroutine(ResetAfterDelay(3f));
+        OnGameOver.Notify (winner);
+        StartCoroutine(ResetAfterDelay(3f));
+    }
+
+    public void ShowDraw () {
+        GameOverCanvas.SetActive (true);
+        gameOverText.text = "Draw!";
+        OnDraw.Notify (true);
+        StartCoroutine(ResetAfterDelay(3f));
     }
 
     [ContextMenu ("Debug State")]
@@ -74,14 +84,11 @@ public class ChessGame : MonoBehaviour {
 
     [ContextMenu ("Render")]
     public void RenderState () {
-        if (chess.NoMovesPossible()) {
-            ShowGameOver (chess.currentTeam == Team.White ? Team.Black : Team.White);
-        }
         pieces = new PieceObject[8, 8];
         if (PieceParent != null) {
             Destroy (PieceParent);
         }
-        PieceParent = new GameObject();
+        PieceParent = new GameObject ();
         PieceParent.transform.parent = transform;
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
@@ -102,6 +109,14 @@ public class ChessGame : MonoBehaviour {
                     }
                 }
             }
+        }
+        if (chess.NoMovesPossible ()) {
+            ShowGameOver (chess.currentTeam == Team.White ? Team.Black : Team.White);
+            return;
+        }
+        if (movesWithoutKill >= 50) {
+            ShowDraw ();
+            return;
         }
     }
 
@@ -150,11 +165,13 @@ public class ChessGame : MonoBehaviour {
             PieceObject endPiece = pieces[end.x, end.y];
             if (endPiece) {
                 Kill (endPiece);
+            } else {
+                movesWithoutKill++;
             }
             pieces[start.x, start.y].DeselectPiece (() => {
                 chess.MakeMove (start, end);
                 RenderState ();
-                OnTeamChanged.Notify(chess.currentTeam);
+                OnTeamChanged.Notify (chess.currentTeam);
             });
         });
 
@@ -162,7 +179,8 @@ public class ChessGame : MonoBehaviour {
 
     private void Kill (PieceObject pieceObject) {
         Piece piece = GetPiece (pieceObject.position);
-        OnKilled.Notify(piece);
+        movesWithoutKill = 0;
+        OnKilled.Notify (piece);
         if (piece is King) {
             ShowGameOver (chess.currentTeam);
         }
@@ -220,9 +238,9 @@ public class ChessGame : MonoBehaviour {
         }
     }
 
-    private IEnumerator ResetAfterDelay(float delay) {
-        yield return new WaitForSeconds(delay);
-        Reset();
+    private IEnumerator ResetAfterDelay (float delay) {
+        yield return new WaitForSeconds (delay);
+        Reset ();
     }
 
     public void Reset () {
@@ -230,7 +248,7 @@ public class ChessGame : MonoBehaviour {
         chess = new Chess ();
         chess.StartFormation ();
         RenderState ();
-        OnTeamChanged.Notify(chess.currentTeam);
+        OnTeamChanged.Notify (chess.currentTeam);
     }
 
 }
