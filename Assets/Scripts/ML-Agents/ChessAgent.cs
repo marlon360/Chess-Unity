@@ -110,7 +110,7 @@ public class ChessAgent : Agent {
             chessGame.MakeMove (move);
             //AddReward (CanBeAttackedReward () - currentCanBeAttackedReward);
         } else {
-            Debug.Log (move);
+            //Debug.Log (move);
             RequestDecision ();
         }
     }
