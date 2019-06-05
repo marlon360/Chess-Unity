@@ -12,9 +12,20 @@ public class InputHandler : MonoBehaviour {
     }
 
     void Update () {
-        if (Input.GetMouseButtonDown (0)) {
+        if (Input.GetMouseButtonDown (0) || Input.touchCount > 0) {
+
             RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+            Ray ray;
+            if (Input.touchCount > 0) {
+                Touch touch = Input.GetTouch (0);
+                if (touch.phase == TouchPhase.Began) {
+                    ray = Camera.main.ScreenPointToRay (touch.position);
+                } else {
+                    return;
+                }
+            } else {
+                ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+            }
             if (Physics.Raycast (ray, out hit, 100.0f)) {
                 GameObject hittedObject = hit.transform.gameObject;
                 PieceObject piece = hittedObject.GetComponentInParent<PieceObject> ();
@@ -30,19 +41,18 @@ public class InputHandler : MonoBehaviour {
     }
 
     private void handlePieceClick (PieceObject clickedPiece) {
-        Piece piece = chessGame.GetPiece(clickedPiece.position);
+        Piece piece = chessGame.GetPiece (clickedPiece.position);
         if (selectedPiece == null) {
-            if (piece.team == chessGame.GetChess().currentTeam) {
+            if (piece.team == chessGame.GetChess ().currentTeam) {
                 SelectPiece (clickedPiece);
             }
-        }
-        else {
+        } else {
             if (selectedPiece == clickedPiece) {
-                DeselectPiece();
+                DeselectPiece ();
             }
-            if (piece.team != chessGame.GetChess().currentTeam) {
-                if (chessGame.GetChess().IsMoveValid(selectedPiece.position, clickedPiece.position)) {
-                    chessGame.MakeMove(selectedPiece.position, clickedPiece.position);
+            if (piece.team != chessGame.GetChess ().currentTeam) {
+                if (chessGame.GetChess ().IsMoveValid (selectedPiece.position, clickedPiece.position)) {
+                    chessGame.MakeMove (selectedPiece.position, clickedPiece.position);
                 };
             }
         }
@@ -50,18 +60,18 @@ public class InputHandler : MonoBehaviour {
 
     public void handleTileClick (Tile tile) {
         if (selectedPiece != null) {
-            if (chessGame.GetChess().IsMoveValid(selectedPiece.position, tile.position)) {
-                chessGame.MakeMove(selectedPiece.position, tile.position);
+            if (chessGame.GetChess ().IsMoveValid (selectedPiece.position, tile.position)) {
+                chessGame.MakeMove (selectedPiece.position, tile.position);
             }
         }
     }
 
-    public void SelectPiece(PieceObject pieceObject) {
+    public void SelectPiece (PieceObject pieceObject) {
         selectedPiece = pieceObject;
-        chessGame.SelectPiece(pieceObject);
+        chessGame.SelectPiece (pieceObject);
     }
-    public void DeselectPiece() {
-        chessGame.DeselectPiece(selectedPiece);
+    public void DeselectPiece () {
+        chessGame.DeselectPiece (selectedPiece);
         selectedPiece = null;
     }
 
